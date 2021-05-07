@@ -15,8 +15,22 @@ namespace Lib
     {
         public bool ReadXMLOperation(string xml)
         {
+            var schema = new XmlSchemaSet();
+            var xmlDoc = XDocument.Parse(xml);
+            var row = xmlDoc.Descendants().Where(x => x.Name.LocalName == "user").First();
+            var operation = GetSubElementValue(row, "operation");
+            Console.WriteLine(operation);
+
             return false;
         }
+
+        object GetSubElementValue(XElement container, string subElementName)
+        {
+            var subElement = container.Descendants().FirstOrDefault(d => d.Name.LocalName == subElementName);
+            if (subElement == null) return null;
+            return subElement.Value;
+        }
+
         public string ReadXMLFiletoString(string path)
         {
             XmlSerializer reader = new XmlSerializer(typeof(User));
@@ -30,7 +44,7 @@ namespace Lib
             var schema = new XmlSchemaSet();
             var xmlDoc = XDocument.Parse(xml, LoadOptions.SetLineInfo);
 
-            schema.Add("", @"C:\User\Administrator\Source\Repos\AnakinDelabelle\Demo_AD-DS_-_AD-LDS\TestENV\xmlData\xsdcontrole.xsd"); //Can change
+            schema.Add("", @"..\..\..\TestENV\xmlData\xsdcontrole.xsd"); //Can change
 
             xmlDoc.Validate(schema, (sender, e) =>
             {
