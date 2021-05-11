@@ -21,15 +21,10 @@ namespace TestENV
             //x.ReadXMLOperation(xml);
             //Console.Read();
 
-            Console.WriteLine("Initializing Consumer...");
-
-            Task.Run(() => {
-                var consumer = new Consumer();
-                consumer.ConsumeMessage();
-            }).Wait(TimeSpan.FromSeconds(5));
+            Console.WriteLine("Initializing Producer...");
+            Thread.Sleep(2000);
 
             var producer = new Producer();
-            var xmlParser = new XMLParser();
             //Demo User Creation
             var demoUser = new User
             {
@@ -37,9 +32,9 @@ namespace TestENV
                 {
                     FirstName = "Demo",
                     LastName = "User",
-                    Email = "demo.user@desideriushogeschool.be",
+                    Email = "demo.user@desideriushogeschool.be", //Gegenereerd op basis Name
                     Role = "student",
-                    Password = "Student1"
+                    Password = "Student1" //Gegenereerd
                 },
                 MetaData = new MetaData
                 {
@@ -49,27 +44,23 @@ namespace TestENV
                     TimeStamp = DateTime.Now
                 }
             };
-
-            Console.WriteLine("Press [enter] to proceed.");
             Console.ReadLine();
+
 
             Console.WriteLine("===================User Creation================\n");
             Console.WriteLine(demoUser + "\n");
             Console.ReadLine();
 
             Console.WriteLine("=================Produce on the QUEUE==============\n");
-            var xmlString = xmlParser.WriteXMLfromObject(demoUser);
+            var xmlString = XMLParser.ObjectToXML(demoUser);
             producer.CreateMessage(xmlString + "\n");
 
-            Console.WriteLine("=================Consume from the QUEUE==============\n");
-            //var xmlFromQueue = xmlParser.WriteXMLfromObject(demoUser);
-            //Console.WriteLine(xmlFromQueue);
             Console.ReadLine();
 
-            Environment.Exit(-1);
+            //Environment.Exit(-1);
 
             Console.WriteLine("=================From XML to Object==============\n");
-            var newUser = xmlParser.XMLtoObject(xmlString);
+            var newUser = XMLParser.XMLToObject(xmlString);
             Console.WriteLine(newUser + "\n");
             Console.ReadLine();
 
@@ -83,12 +74,12 @@ namespace TestENV
             Console.ReadLine();
 
             Console.WriteLine("\n\n===================Update Demo User from XML================\n");
-            var xmlUpdate = xmlParser.ReadXMLFiletoString(@"C:\User\Administrator\source\repos\AnakinDelabelle\Demo_AD-DS_-_AD-LDS\TestENV\xmlData\UpdateDemo.xml");
+            var xmlUpdate = XMLParser.ReadXMLFiletoString(@"C:\User\Administrator\source\repos\AnakinDelabelle\Demo_AD-DS_-_AD-LDS\TestENV\xmlData\UpdateDemo.xml");
             Console.WriteLine(xmlUpdate);
             Console.ReadLine();
 
             Console.WriteLine("Updating Demo User...");
-            program.UpdateUser("CN=Demo User", xmlParser.XMLtoObject(xmlUpdate));
+            program.UpdateUser("CN=Demo User", XMLParser.XMLToObject(xmlUpdate));
             Console.WriteLine("Finding Updated User in Active Directory...");
             var updatedUser = program.FindADUser("CN=UpdatedDemo User");
 

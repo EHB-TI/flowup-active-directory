@@ -4,13 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lib
 {
      public class Consumer
     {
-        public XMLParser XMLParser { get; set; }
         public void ConsumeMessage()
         {
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
@@ -21,7 +21,7 @@ namespace Lib
 
                 var queueName = channel.QueueDeclare().QueueName;
 
-                channel.QueueBind(queue: "user",
+                channel.QueueBind(queue: queueName,
                                   exchange: "direct_logs",
                                   routingKey: "user");
                 Console.WriteLine(" [*] Waiting for messages.");
@@ -35,18 +35,17 @@ namespace Lib
                     Console.WriteLine(" [x] Received '{0}':'{1}'",
                                       routingKey, message);
 
-                    Console.WriteLine(XMLParser.XMLtoObject(message));
+                    //Get CRUD Operation and tranfser to functionality
+                    XMLParser.ReadXMLOperation(message).OperationToCRUD(XMLParser.XMLToObject(message));
 
-                    if (routingKey == "user")
-                    {
-                        Console.WriteLine("user");
-                    }
+                    //if (routingKey == "user")
+                    //{
+                    //    Console.WriteLine("user");
+                    //}
                 };
                 channel.BasicConsume(queue: queueName,
                                      autoAck: true,
                                      consumer: consumer);
-
-                Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
             }
         }

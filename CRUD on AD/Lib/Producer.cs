@@ -20,31 +20,29 @@ namespace Lib
 
                 string severity = "user";
                 
-                string message = "<user><header>" +
-                    "<UUID>333ade47-03d1-40bb-9912-9a6c86a60169</UUID>" +
-                    "<method>CREATE</method>" +
-                    "<origin>AD</origin>" +
-                    "<timestamp> 2021 - 05 - 25T12: 00:00 + 01:00 </timestamp>" +
-                    "</header>" +
-                    "<body>" +
-                    "<firstname>Tibo</firstname>" +
-                    "<lastname>De Munck</lastname>" +
-                    "<email>tibo.de.munck@student.dhb.be</email>" +
-                    "<role>student</role>" +
-                    "</body></user >";
+                //string message = "<user><header>" +
+                //    "<UUID>333ade47-03d1-40bb-9912-9a6c86a60169</UUID>" +
+                //    "<method>CREATE</method>" +
+                //    "<origin>AD</origin>" +
+                //    "<timestamp> 2021 - 05 - 25T12: 00:00 + 01:00 </timestamp>" +
+                //    "</header>" +
+                //    "<body>" +
+                //    "<firstname>Tibo</firstname>" +
+                //    "<lastname>De Munck</lastname>" +
+                //    "<email>tibo.de.munck@student.dhb.be</email>" +
+                //    "<role>student</role>" +
+                //    "</body></user >";
 
-                var body = Encoding.UTF8.GetBytes(message);
+                var body = Encoding.UTF8.GetBytes(xml);
 
                 channel.BasicPublish(exchange: "direct_logs",
                                      routingKey: severity,
                                      basicProperties: null,
                                      body: body);
 
-                Console.WriteLine(" [x] Sent on Queue '{0}':'{1}'", severity, message);
+                Console.WriteLine(" [x] Sent on Queue '{0}':'{1}'", severity, xml);
             }
-            Console.WriteLine(" Press [enter] to exit.\n\n");
-            Console.ReadLine();
-
+            Console.WriteLine("Producer Initialized!\n\n");
         }
     }
 }

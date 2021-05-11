@@ -11,55 +11,83 @@ using System.Xml.Serialization;
 
 namespace Lib
 {
-    public class XMLParser
+    public static class XMLParser
     {
-        public bool ReadXMLOperation(string xml)
+        public static void OperationToCRUD(this string operation, User user) 
+        {
+            switch (operation.ToUpperInvariant())
+            {
+                case "CREATE":
+                    break;
+                case "DELETE":
+                    break;
+                case "UPDATE":
+                    break;
+                case "READ":
+                    break;
+                case "NOT SET":
+                    break;
+                default:
+                    Console.WriteLine(operation);
+                    break;
+            }
+        }
+        public static string ReadXMLOperation(string xml)
         {
             var schema = new XmlSchemaSet();
             var xmlDoc = XDocument.Parse(xml);
             var row = xmlDoc.Descendants().Where(x => x.Name.LocalName == "user").First();
-            var operation = GetSubElementValue(row, "operation");
+            var operation = GetSubElementValue(row, "method");
             Console.WriteLine(operation);
 
-            return false;
+            return (string)operation;
         }
 
-        object GetSubElementValue(XElement container, string subElementName)
+        public static object GetSubElementValue(XElement container, string subElementName)
         {
             var subElement = container.Descendants().FirstOrDefault(d => d.Name.LocalName == subElementName);
             if (subElement == null) return null;
             return subElement.Value;
         }
 
-        public string ReadXMLFiletoString(string path)
+        public static string ReadXMLFiletoString(string path)
         {
             XmlSerializer reader = new XmlSerializer(typeof(User));
             StreamReader file = new StreamReader(path);
-            var xml = WriteXMLfromObject((User)reader.Deserialize(file));
+            var xml = ObjectToXML((User)reader.Deserialize(file));
             file.Close();
             return xml;
         }
-        public User XMLtoObject(string xml)
+        public static User XMLToObject(string xml)
         {
-            var schema = new XmlSchemaSet();
-            var xmlDoc = XDocument.Parse(xml, LoadOptions.SetLineInfo);
+            //if (!ValidateXML(xml))   
+            //{
+            //    Debug.WriteLine("Ongeldige XML!!!");
+            //}
 
-            schema.Add("", @"..\..\..\TestENV\xmlData\xsdcontrole.xsd"); //Can change
-
-            xmlDoc.Validate(schema, (sender, e) =>
-            {
-                Debug.WriteLine("XML is ongeldig");
-            });
-
-            Debug.WriteLine("XML is geldig");
             var serializer = new XmlSerializer(typeof(User));
             var reader = new StringReader(xml);
             var user = (User)serializer.Deserialize(reader);
 
             return user;
         }
+        public static bool ValidateXML(string xml)
+        {
+            var schema = new XmlSchemaSet();
+            var xmlDoc = XDocument.Parse(xml, LoadOptions.SetLineInfo);
+            var check = true;
 
-        public string WriteXMLfromObject(User user)
+            schema.Add("", @"..\..\..\TestENV\xmlData\xsdcontrole.xsd"); //Can change
+
+            xmlDoc.Validate(schema, (sender, e) =>
+            {
+                check = false;
+            });
+
+            return check;
+        }
+
+        public static string ObjectToXML(User user)
         {
             // First write something so that there is something to read ...  
             //var user = new User { UserData = new UserData { FirstName = "Anakin", LastName = "Delabelle", Email = "anakin.delabelle@student.ehb.be", Role = "student" } };

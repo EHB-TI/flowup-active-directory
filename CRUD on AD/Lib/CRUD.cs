@@ -18,7 +18,7 @@ namespace Lib
             if (conn == Connection.LOCAL)
             {
                 RootOU = new DirectoryEntry             //SSL on AD DS is standard
-                    ("LDAP://AD-S1-Desiderius-Hogeschool.desideriushogeschool.be/CN=User,DC=desideriushogeschool,DC=be",
+                    ("LDAP://AD-S1-Desiderius-Hogeschool.desideriushogeschool.be/CN=Users,DC=desideriushogeschool,DC=be",
                     "Administrator",
                     "Student1",
                     AuthenticationTypes.Secure
@@ -60,7 +60,7 @@ namespace Lib
             objUser.Properties["role"].Add(user.UserData.Role);
             objUser.Properties["sAMAccountName"].Add($"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant()}");
             objUser.Properties["userPrincipalName"].Add($"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant().Replace(" ", ".")}@desideriushogeschool.be");
-            objUser.Properties["userPassword"].Add(user.UserData.Password);
+            //objUser.Properties["userPassword"].Add(user.UserData.Password);
 
             //Enable Account -- Cannot change account state from another machine
             const int UF_ACCOUNTDISABLE = 0x0002;
@@ -148,8 +148,9 @@ namespace Lib
 
         public DirectorySearcher SetupSearcher(string filter, bool loadAttributes=false) 
         {
-            var Searcher = new DirectorySearcher(RootOU);
+            var Searcher = new DirectorySearcher(RootOU); 
             Searcher.Filter = filter; //(&(objectCategory=Person)(objectClass=user))
+
 
             if (loadAttributes)
             {
