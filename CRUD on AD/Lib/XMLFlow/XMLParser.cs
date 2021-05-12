@@ -8,25 +8,31 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Lib.UUIDFlow;
 
 namespace Lib
 {
     public static class XMLParser
     {
-        public static void OperationToCRUD(this string operation, User user) 
+        public static void OperationToCRUD(this string operation, User user, CRUD crudInstance, UUIDConnection conn) 
         {
             switch (operation.ToUpperInvariant())
             {
                 case "CREATE":
+
+                    crudInstance.CreateUser(user.UserObjectToADObject());
                     break;
                 case "DELETE":
+                    crudInstance.DeleteUser($"CN={user.UserData.FirstName} {user.UserData.FirstName}");
                     break;
                 case "UPDATE":
+                    var oldUser = crudInstance.FindADUser(UUIDParser.GetGUIDFromUUID(conn, user.MetaData.UUIDMaster));//Get GUID -> Search AD with GUID -> Convert DirectoryEntry to ADUserObject
+                    crudInstance.UpdateUser(oldUser, user.UserObjectToADObject());
                     break;
-                case "READ":
-                    break;
-                case "NOT SET":
-                    break;
+                //case "READ":
+                //    break;
+                //case "NOT SET":
+                //    break;
                 default:
                     Console.WriteLine(operation);
                     break;

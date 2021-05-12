@@ -36,121 +36,89 @@ namespace Lib
         }
 
 
-        public bool CreateUser(User user)
+        public bool CreateUser(ADUser adUser)
         {
-            //Create user info
-            DirectoryEntry objUser;
-            var objName = $"CN={user.UserData.FirstName} {user.UserData.LastName}";
-            var name = $"{user.UserData.FirstName} {user.UserData.LastName}";
-
             //Check in AD and UUID for duplicates
-            if (SetupSearcher($"(&(objectCategory=Person)({objName}))").FindAll().Count != 0)
+            if (IsUserNotInAD(adUser.CN))   
             {
-                throw new Exception("User allready exists!");
+                //Create User object
+                //Set:  Name, CN,
+                //Not Set:  SN, sAMAccountName, Email, Role, GivenName, DisplayName
+                var entry = RootOU.Children.Add(adUser.CN, "user");
+                adUser.AssignADObjectAttributesToDirectoryEntry(entry);
+
+                entry.CommitChanges();
+
+                Debug.WriteLine("User Creation Succeeded!");
+                return true;
             }
-
-            //Create User object
-            //Set:  Name, CN,
-            //Not Set:  SN, sAMAccountName, Email, Role, GivenName, DisplayName
-            objUser = RootOU.Children.Add(objName, "user");
-            objUser.Properties["displayName"].Add(name);
-            objUser.Properties["givenName"].Add(user.UserData.FirstName);
-            objUser.Properties["sn"].Add(user.UserData.LastName);
-            objUser.Properties["mail"].Add(user.UserData.Email);
-            objUser.Properties["role"].Add(user.UserData.Role);
-            objUser.Properties["sAMAccountName"].Add($"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant()}");
-            objUser.Properties["userPrincipalName"].Add($"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant().Replace(" ", ".")}@desideriushogeschool.be");
-            //objUser.Properties["userPassword"].Add(user.UserData.Password);
-
-            //Enable Account -- Cannot change account state from another machine
-            const int UF_ACCOUNTDISABLE = 0x0002;
-            const int UF_PASSWD_NOTREQD = 0x0020;
-            const int UF_PASSWD_CANT_CHANGE = 0x0040;
-            const int UF_NORMAL_ACCOUNT = 0x0200;
-            const int UF_DONT_EXPIRE_PASSWD = 0x10000;
-            const int UF_SMARTCARD_REQUIRED = 0x40000;
-            const int UF_PASSWORD_EXPIRED = 0x800000;
-            //objUser.Properties["userAccountControl"].Value = (UF_NORMAL_ACCOUNT);
-
-            objUser.CommitChanges();
-
-            Debug.WriteLine("User Creation Succeeded!");
-            return true;
+            return false;
         }
 
-        public bool DeleteUser(string name)
+        public bool DeleteUser(string CN)
         {
-            DirectoryEntry objUser = SetupSearcher($"(&(objectCategory=Person)({name}))").FindOne().GetDirectoryEntry(); ;
-            RootOU.Children.Remove(objUser);
-
-            return true;
+            if (IsUserInAD(CN))
+            {
+                DirectoryEntry objUser = SetupSearcher($"(&(objectCategory=Person)({CN}))").FindOne().GetDirectoryEntry(); ;
+                RootOU.Children.Remove(objUser);
+                return true;
+            }
+            return false;
         }
 
-        public User FindADUser(string v)
+        public ADUser FindADUser(string CN)
         {
-            DirectoryEntry objUser = SetupSearcher($"(&(objectCategory=Person)({v}))", true).FindOne().GetDirectoryEntry();
-
-            User user = new User();
-            user.UserData.FirstName = (String)objUser.Properties["givenname"].Value;
-            user.UserData.LastName = (String)objUser.Properties["sn"].Value;
-            user.UserData.Email = (String)objUser.Properties["userprincipalname"].Value;
-            user.UserData.Role = (String)objUser.Properties["role"].Value;
-            //user.UserData.Password = new String('*', objUser.Properties["userpassword"].Capacity);
-
-            return user;
+            if (IsUserInAD(CN))
+            {
+                DirectoryEntry objUser = SetupSearcher($"(&(objectCategory=Person)({CN}))", true).FindOne().GetDirectoryEntry();
+                return objUser.DirectoryEntryToADObject();
+            }
+            return null;
         }
 
-        public bool UpdateUser(string oldName, User user)
+        public bool UpdateUser(ADUser oldUser, ADUser newUser)
         {
-            var objUser = SetupSearcher($"(&(objectCategory=Person)({oldName}))", true).FindOne().GetDirectoryEntry();
+            if (IsUserInAD(oldUser.CN))
+            {
+                var objUser = SetupSearcher($"(&(objectCategory=Person)({oldUser.CN}))", true).FindOne().GetDirectoryEntry();
 
-            var objName = $"CN={user.UserData.FirstName} {user.UserData.LastName}";
-            var name = $"{user.UserData.FirstName} {user.UserData.LastName}";
+                objUser.Rename(newUser.CN);
+                newUser.AssignADObjectAttributesToDirectoryEntry(objUser);
 
-            objUser.Rename(objName);
-            objUser.Properties["givenname"][0] = user.UserData.FirstName;
-            objUser.Properties["userPrincipalName"][0] = $"{(user.UserData.Email.Contains("@") ? user.UserData.Email.Substring(0, user.UserData.Email.IndexOf("@")) : user.UserData.Email)}@desideriushogeschool.be";
-            //objUser.Properties["userPassword"][0] = user.UserData.Password;
-            objUser.Properties["displayName"][0] = name; //Multi
-            objUser.Properties["sn"][0] = user.UserData.LastName;
-            objUser.Properties["mail"][0] = user.UserData.Email;
-            objUser.Properties["role"][0] = user.UserData.Role;
-            objUser.Properties["sAMAccountName"][0] = $"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant().Replace(" ", ".")}";
+                objUser.UsePropertyCache = true;
+                objUser.CommitChanges();
 
-            objUser.UsePropertyCache = true;
-            objUser.CommitChanges();
-            Console.WriteLine("User succesfully updated!");
-
-            return true;
+                Console.WriteLine("User succesfully updated!");
+                return true;
+            }
+            return false;
         }
 
-        public List<String> GetADUsers()
+        public List<ADUser> GetADUsers()
         {
-            List<String> lstADUsers = new List<String>();
-            SearchResult result;
+            var lstADUsers = new List<ADUser>();
             SearchResultCollection resultCol = SetupSearcher("(&(objectCategory=Person)(objectClass=user))", true).FindAll();
 
             if (resultCol != null)
             {
                 for (int counter = 0; counter < resultCol.Count; counter++)
                 {
-                    result = resultCol[counter];
-                    var res = result.GetDirectoryEntry();
+                    var result = resultCol[counter];
+                    var entry = result.GetDirectoryEntry();
 
                     if (result.Properties.Contains("givenname"))
                     {
-                        lstADUsers.Add((String)res.Properties["cn"].Value);
+                        lstADUsers.Add(entry.DirectoryEntryToADObject());
                     }
                 }
             }
             return lstADUsers;
         }
 
-        public DirectorySearcher SetupSearcher(string filter, bool loadAttributes=false) 
+        private DirectorySearcher SetupSearcher(string filter, bool loadAttributes=false) 
         {
             var Searcher = new DirectorySearcher(RootOU); 
             Searcher.Filter = filter; //(&(objectCategory=Person)(objectClass=user))
-
 
             if (loadAttributes)
             {
@@ -165,6 +133,22 @@ namespace Lib
                 Searcher.PropertiesToLoad.Add("givenname");
             }
             return Searcher;
+        }
+        public bool IsUserInAD(string CN)
+        {
+            if (SetupSearcher($"(&(objectCategory=Person)({CN}))").FindAll().Count == 0)
+            {
+                throw new Exception("User does not exists in Active Directory!");
+            }
+            return true;
+        }
+        public bool IsUserNotInAD(string CN)
+        {
+            if (SetupSearcher($"(&(objectCategory=Person)({CN}))").FindAll().Count != 0)
+            {
+                throw new Exception("User exists in Active Directory!");
+            }
+            return true;
         }
     }
 }

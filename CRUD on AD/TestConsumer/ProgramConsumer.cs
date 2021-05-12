@@ -14,6 +14,7 @@ namespace TestConsumer
             Console.WriteLine("Initializing Consumer...");
 
             var consumer = new Consumer();
+
             consumer.ConsumeMessage();
         }
     }

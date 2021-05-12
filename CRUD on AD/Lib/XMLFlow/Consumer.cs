@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Lib.UUIDFlow;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,14 @@ namespace Lib
 {
      public class Consumer
     {
+        public CRUD CRUD { get; set; }
+        public UUIDConnection UConnection { get; set; }
+
+        public Consumer()
+        {
+            CRUD = new CRUD();
+            CRUD.Binding(Lib.Connection.LOCAL);
+        }
         public void ConsumeMessage()
         {
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
@@ -36,7 +45,7 @@ namespace Lib
                                       routingKey, message);
 
                     //Get CRUD Operation and tranfser to functionality
-                    XMLParser.ReadXMLOperation(message).OperationToCRUD(XMLParser.XMLToObject(message));
+                    XMLParser.ReadXMLOperation(message).OperationToCRUD(XMLParser.XMLToObject(message), CRUD, UConnection);
 
                     //if (routingKey == "user")
                     //{

@@ -64,17 +64,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UserFlow\ADUser.cs" />
     <Compile Include="Connection.cs" />
-    <Compile Include="Consumer.cs" />
+    <Compile Include="UUIDFlow\UUIDConnection.cs" />
+    <Compile Include="XMLFlow\Consumer.cs" />
     <Compile Include="CRUD.cs" />
-    <Compile Include="Producer.cs" />
+    <Compile Include="XMLFlow\Producer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="User.cs" />
-    <Compile Include="XMLParser.cs" />
+    <Compile Include="UserFlow\User.cs" />
+    <Compile Include="UserFlow\UserParser.cs" />
+    <Compile Include="UUIDFlow\UUIDParser.cs" />
+    <Compile Include="XMLFlow\XMLParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

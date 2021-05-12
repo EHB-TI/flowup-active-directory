@@ -46,50 +46,6 @@ namespace TestENV
             };
             Console.ReadLine();
 
-
-            Console.WriteLine("===================User Creation================\n");
-            Console.WriteLine(demoUser + "\n");
-            Console.ReadLine();
-
-            Console.WriteLine("=================Produce on the QUEUE==============\n");
-            var xmlString = XMLParser.ObjectToXML(demoUser);
-            producer.CreateMessage(xmlString + "\n");
-
-            Console.ReadLine();
-
-            //Environment.Exit(-1);
-
-            Console.WriteLine("=================From XML to Object==============\n");
-            var newUser = XMLParser.XMLToObject(xmlString);
-            Console.WriteLine(newUser + "\n");
-            Console.ReadLine();
-
-            Console.WriteLine("Starting Program...");
-            var program = new CRUD();
-            Console.WriteLine("Connecting to Active Directory...");
-            program.Binding(Connection.LOCAL);
-            Console.WriteLine("Adding Demo User in Active Directory...");
-            program.CreateUser(newUser);
-            Console.WriteLine("\nUser succesfully created in Active Directory...");
-            Console.ReadLine();
-
-            Console.WriteLine("\n\n===================Update Demo User from XML================\n");
-            var xmlUpdate = XMLParser.ReadXMLFiletoString(@"C:\User\Administrator\source\repos\AnakinDelabelle\Demo_AD-DS_-_AD-LDS\TestENV\xmlData\UpdateDemo.xml");
-            Console.WriteLine(xmlUpdate);
-            Console.ReadLine();
-
-            Console.WriteLine("Updating Demo User...");
-            program.UpdateUser("CN=Demo User", XMLParser.XMLToObject(xmlUpdate));
-            Console.WriteLine("Finding Updated User in Active Directory...");
-            var updatedUser = program.FindADUser("CN=UpdatedDemo User");
-
-            Console.WriteLine("\n===================Updated User================\n");
-            Console.WriteLine(updatedUser + "\n");
-            Console.ReadLine();
-
-            Console.WriteLine("Deleting UpdatedDemo User...");
-            program.DeleteUser("CN=UpdatedDemo User");
-            Console.ReadLine();
         }
     }
 }
