@@ -10,6 +10,7 @@ namespace Lib.UUIDFlow
     {
         public static string GetGUIDFromUUID(UUIDConnection conn, string uuid)
         {
+            var query = ;
             return "";
         }
         public static bool IsUserInUUID(UUIDConnection conn, string uuid)

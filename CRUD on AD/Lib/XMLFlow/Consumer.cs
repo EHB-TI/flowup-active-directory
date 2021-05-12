@@ -19,6 +19,8 @@ namespace Lib
         {
             CRUD = new CRUD();
             CRUD.Binding(Lib.Connection.LOCAL);
+
+            UConnection = new UUIDConnection();
         }
         public void ConsumeMessage()
         {
