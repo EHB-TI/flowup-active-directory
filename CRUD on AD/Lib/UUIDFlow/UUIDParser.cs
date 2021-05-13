@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace Lib.UUIDFlow
 {
     public static class UUIDParser
     {
-        public static string GetGUIDFromUUID(UUIDConnection conn, string uuid)
+        public static string GetGUIDFromUUID(MySqlConnection conn, string uuid)
         {
-            var query = ;
+            var query = "SELECT";
+            var command = new MySqlCommand(query, conn);
+            var reader = command.ExecuteReader();
+            Console.WriteLine("");
             return "";
         }
         public static bool IsUserInUUID(UUIDConnection conn, string uuid)

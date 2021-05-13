@@ -59,7 +59,7 @@ namespace Lib
         {
             if (IsUserInAD(CN))
             {
-                DirectoryEntry objUser = SetupSearcher($"(&(objectCategory=Person)({CN}))").FindOne().GetDirectoryEntry(); ;
+                DirectoryEntry objUser = SetupSearcher($"(&(objectCategory=Person)({CN}))").FindOne().GetDirectoryEntry();
                 RootOU.Children.Remove(objUser);
                 return true;
             }

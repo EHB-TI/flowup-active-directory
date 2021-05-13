@@ -95,10 +95,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="UserFlow\ADUser.cs" />
-    <Compile Include="Connection.cs" />
+    <Compile Include="CRUDFlow\Connection.cs" />
     <Compile Include="UUIDFlow\UUIDConnection.cs" />
     <Compile Include="XMLFlow\Consumer.cs" />
-    <Compile Include="CRUD.cs" />
+    <Compile Include="CRUDFlow\CRUD.cs" />
     <Compile Include="XMLFlow\Producer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserFlow\User.cs" />

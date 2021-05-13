@@ -37,7 +37,7 @@ namespace Lib
                 Role = user.UserData.Role
             };
         }
-        public static DirectoryEntry AssignADObjectAttributesToDirectoryEntry(this ADUser adUser, DirectoryEntry entry)
+        public static void AssignADObjectAttributesToDirectoryEntry(this ADUser adUser, DirectoryEntry entry)
         {
             entry.Properties["displayName"].Add(adUser.Name);
             entry.Properties["givenName"].Add(adUser.GivenName);
@@ -46,7 +46,6 @@ namespace Lib
             entry.Properties["role"].Add(adUser.Role);
             entry.Properties["sAMAccountName"].Add(adUser.SAMAccountName);
             entry.Properties["userPrincipalName"].Add(adUser.UserPrincipalName);
-            return entry;
         }
         public static ADUser DirectoryEntryToADObject(this DirectoryEntry entry)
         {

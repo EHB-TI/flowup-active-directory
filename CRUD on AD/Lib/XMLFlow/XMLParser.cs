@@ -19,14 +19,13 @@ namespace Lib
             switch (operation.ToUpperInvariant())
             {
                 case "CREATE":
-
                     crudInstance.CreateUser(user.UserObjectToADObject());
                     break;
                 case "DELETE":
                     crudInstance.DeleteUser($"CN={user.UserData.FirstName} {user.UserData.FirstName}");
                     break;
                 case "UPDATE":
-                    var oldUser = crudInstance.FindADUser(UUIDParser.GetGUIDFromUUID(conn, user.MetaData.UUIDMaster));//Get GUID -> Search AD with GUID -> Convert DirectoryEntry to ADUserObject
+                    var oldUser = crudInstance.FindADUser(UUIDParser.GetGUIDFromUUID(conn.Conn, user.MetaData.UUIDMaster));//Get GUID -> Search AD with GUID -> Convert DirectoryEntry to ADUserObject
                     crudInstance.UpdateUser(oldUser, user.UserObjectToADObject());
                     break;
                 //case "READ":
