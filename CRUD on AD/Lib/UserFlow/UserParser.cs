@@ -39,27 +39,28 @@ namespace Lib
         }
         public static void AssignADObjectAttributesToDirectoryEntry(this ADUser adUser, DirectoryEntry entry)
         {
-            entry.Properties["displayName"].Add(adUser.Name);
-            entry.Properties["givenName"].Add(adUser.GivenName);
-            entry.Properties["sn"].Add(adUser.SN);
-            entry.Properties["mail"].Add(adUser.Mail);
-            entry.Properties["role"].Add(adUser.Role);
-            entry.Properties["sAMAccountName"].Add(adUser.SAMAccountName);
-            entry.Properties["userPrincipalName"].Add(adUser.UserPrincipalName);
+            entry.Properties["displayName"].Value = adUser.Name;
+            entry.Properties["givenName"].Value = adUser.GivenName;
+            entry.Properties["sn"].Value = adUser.SN;
+            entry.Properties["mail"].Value = adUser.Mail;
+            entry.Properties["role"].Value = adUser.Role;
+            entry.Properties["sAMAccountName"].Value = adUser.SAMAccountName;
+            entry.Properties["userPrincipalName"].Value = adUser.UserPrincipalName;
         }
         public static ADUser DirectoryEntryToADObject(this DirectoryEntry entry)
         {
-            var adUser = new ADUser();
-            adUser.CN = (string)entry.Properties["cn"].Value;
-            adUser.SN = (string)entry.Properties["sn"].Value;
-            adUser.Role = (string)entry.Properties["role"].Value;
-            adUser.Name = (string)entry.Properties["name"].Value;
-            adUser.GivenName = (string)entry.Properties["givenName"].Value;
-            adUser.UserPrincipalName = (string)entry.Properties["userPrincipalName"].Value;
-            adUser.Mail = (string)entry.Properties["mail"].Value;
-            adUser.DisplayName = (string)entry.Properties["displayName"].Value;
-            adUser.SAMAccountName = (string)entry.Properties["sAMAccountName"].Value;
-            return adUser;
+            return new ADUser
+            {
+                CN = (string)entry.Properties["cn"].Value,
+                SN = (string)entry.Properties["sn"].Value,
+                Role = (string)entry.Properties["role"].Value,
+                Name = (string)entry.Properties["name"].Value,
+                GivenName = (string)entry.Properties["givenName"].Value,
+                UserPrincipalName = (string)entry.Properties["userPrincipalName"].Value,
+                Mail = (string)entry.Properties["mail"].Value,
+                DisplayName = (string)entry.Properties["displayName"].Value,
+                SAMAccountName = (string)entry.Properties["sAMAccountName"].Value
+            };
         }
     }
 }

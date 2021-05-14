@@ -29,10 +29,10 @@ namespace MainWindow
             fieldResults.Items.Clear();
             try
             {
-                List<String> l = Program.GetADUsers();
+                List<ADUser> l = Program.GetADUsers();
                 if (l != null)
                 {
-                    l.ForEach(x => fieldResults.Items.Add($"CN={x}"));
+                    l.ForEach(x => fieldResults.Items.Add($"CN={x.CN}"));
                 }
                 else
                 {
@@ -54,7 +54,7 @@ namespace MainWindow
             {
                 try
                 {
-                    if (Program.CreateUser(w.Answer))
+                    if (Program.CreateUser(w.Answer.UserObjectToADObject()))
                     {
                         MessageBox.Show("User succesfully created!");
                         btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
@@ -64,7 +64,6 @@ namespace MainWindow
                 {
                     MessageBox.Show(ex.Message);
                 }
-
             }
         }
 
@@ -106,24 +105,25 @@ namespace MainWindow
         {
             if (fieldResults.SelectedIndex != -1)
             {
-                DialogWindow w = new DialogWindow(Program.FindADUser(fieldResults.SelectedValue.ToString()));
+                var oldUser = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToUserObject();
+                DialogWindow w = new DialogWindow(oldUser);
                 w.ShowDialog();
 
                 if (w.DialogResult == true)
                 {
-                    Debug.WriteLine(fieldResults.SelectedValue.ToString().Substring(9));
-                    try
-                    {
-                        if (Program.UpdateUser(fieldResults.SelectedValue.ToString(), w.Answer))
+                    Debug.WriteLine(fieldResults.SelectedValue.ToString());
+                    //try
+                    //{
+                        if (Program.UpdateUser(oldUser.UserObjectToADObject(), w.Answer.UserObjectToADObject()))
                         {
                             MessageBox.Show("User succesfully updated!");
                             btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    MessageBox.Show(ex.Message);
+                    //}
                 }
             }
             else

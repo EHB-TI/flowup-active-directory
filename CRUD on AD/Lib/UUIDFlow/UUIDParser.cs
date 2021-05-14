@@ -33,5 +33,9 @@ namespace Lib.UUIDFlow
             */
             return "";
         }
+        public static bool CheckUUID()
+        {
+            return false;
+        }
     }
 }

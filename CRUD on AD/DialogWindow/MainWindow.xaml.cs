@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media;
 using Lib;
 
 namespace InputWindow
@@ -14,6 +15,8 @@ namespace InputWindow
         {
             InitializeComponent();
 
+            txtEmail.IsEnabled = false;
+            
             btnConfirm.Content = "Create";
         }
 
@@ -21,12 +24,12 @@ namespace InputWindow
         {
             InitializeComponent();
 
-
             rdDocent.IsChecked = rdStudent.IsChecked = false;
 
             txtFirstName.Text = user.UserData.FirstName;
             txtLastName.Text = user.UserData.LastName;
             txtEmail.Text = user.UserData.Email;
+            txtEmail.IsReadOnly = true;
             if (user.UserData.Role == "student") { rdStudent.IsChecked = true; } else { rdDocent.IsChecked = true; }
             txtPassword.Text = user.UserData.Password;
 
