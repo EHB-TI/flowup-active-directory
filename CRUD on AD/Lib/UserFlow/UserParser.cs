@@ -19,6 +19,10 @@ namespace Lib
                     LastName = adUser.SN,
                     Email = adUser.Mail,
                     Role = adUser.Role
+                },
+                MetaData = new MetaData
+                {
+                    GUID = adUser.ObjectGUID,
                 }
             };
         }

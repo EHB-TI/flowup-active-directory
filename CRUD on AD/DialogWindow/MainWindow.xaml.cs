@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Media;
 using Lib;
 
@@ -9,11 +10,14 @@ namespace InputWindow
     /// </summary>
     public partial class DialogWindow : Window
     {
-        public User Answer { get { return new User { UserData = new UserData { FirstName = txtFirstName.Text, LastName = txtLastName.Text, Email = txtEmail.Text, Role = (rdStudent.IsChecked == true) ? "student" : "docent", Password = txtPassword.Text } }; } }
+        public MetaData Data { get; set; }
+        public User Answer { get { return new User { UserData = new UserData { FirstName = txtFirstName.Text, LastName = txtLastName.Text, Email = txtEmail.Text, Role = (rdStudent.IsChecked == true) ? "student" : "docent", Password = txtPassword.Text }, MetaData = Data}; } }
 
         public DialogWindow()
-        {
+        {   
             InitializeComponent();
+
+            Data = new MetaData { Methode = CRUDMethode.CREATE, Origin = "AD", TimeStamp = DateTime.Now, UUIDMaster = "NOT SET", GUID = "NOT SET"};
 
             txtEmail.IsEnabled = false;
             
@@ -23,6 +27,8 @@ namespace InputWindow
         public DialogWindow(User user)
         {
             InitializeComponent();
+
+            Data = new MetaData { Methode = CRUDMethode.UPDATE, Origin = "AD", TimeStamp = DateTime.Now, UUIDMaster = user.MetaData.UUIDMaster, GUID = user.MetaData.GUID};
 
             rdDocent.IsChecked = rdStudent.IsChecked = false;
 

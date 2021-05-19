@@ -33,6 +33,8 @@ namespace Lib
         public string Origin { get; set; }
         [XmlElement("timestamp")]
         public DateTime TimeStamp { get; set; }
+        [XmlIgnore]
+        public string GUID { get; set; }    
     }
 
     public class UserData

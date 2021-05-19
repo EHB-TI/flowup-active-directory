@@ -1,15 +1,13 @@
-﻿using RabbitMQ.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Text;
-using System.Threading.Tasks;
+using RabbitMQ.Client;
 
 namespace Lib
 {
-    public class Producer
+    public static class Producer
     {
-        public void CreateMessage(string xml)
+        public static readonly string[] QUEUES = {"user"};
+        public static void MessageUserQueue(string xml)
         {
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
             using (var connection = factory.CreateConnection())
@@ -44,5 +42,28 @@ namespace Lib
             }
             Console.WriteLine("Producer Initialized!\n\n");
         }
+
+        public static bool MessageADQueue(string xml) 
+        {
+            var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                channel.ExchangeDeclare(exchange: "direct_logs", type: "direct");
+
+                var body = Encoding.UTF8.GetBytes(xml);
+                var queue = "ClientRequest";
+
+                channel.BasicPublish(exchange: "direct_logs",
+                                     routingKey: queue,
+                                     basicProperties: null,
+                                     body: body);
+
+                Console.WriteLine(" [x] Sent on Queue '{0}':'{1}'", queue, xml);
+                return true;
+            }
+            return false;
+        }
     }
+
 }

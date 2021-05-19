@@ -16,17 +16,23 @@ namespace Lib
     {
         public static void OperationToCRUD(this string operation, User user, CRUD crudInstance, UUIDConnection conn) 
         {
+            bool succes;
+            var adUser = user.UserObjectToADObject();
             switch (operation.ToUpperInvariant())
             {
                 case "CREATE":
-                    crudInstance.CreateUser(user.UserObjectToADObject());
+                    succes = crudInstance.CreateUser(user.UserObjectToADObject());
+                    if (crudInstance.IsUserInAD(adUser.CN) && user.MetaData.GUID == "Not Set")
+                    {
+                        user.MetaData.GUID = crudInstance.FindADUser(adUser.CN).ObjectGUID;
+                    }
                     break;
                 case "DELETE":
-                    crudInstance.DeleteUser($"CN={user.UserData.FirstName} {user.UserData.FirstName}");
+                    succes = crudInstance.DeleteUser(adUser.CN);
                     break;
                 case "UPDATE":
-                    var oldUser = crudInstance.FindADUser(UUIDParser.GetGUIDFromUUID(conn.Conn, user.MetaData.UUIDMaster));//Get GUID -> Search AD with GUID -> Convert DirectoryEntry to ADUserObject
-                    crudInstance.UpdateUser(oldUser, user.UserObjectToADObject());
+                    var oldUser = crudInstance.FindADUser("objectGUID=" + UUIDParser.GetGUIDFromUUID(conn.Conn, user.MetaData.UUIDMaster));//Get GUID -> Search AD with GUID -> Convert DirectoryEntry to ADUserObject
+                    succes = crudInstance.UpdateUser(oldUser, user.UserObjectToADObject());
                     break;
                 //case "READ":
                 //    break;
@@ -34,7 +40,15 @@ namespace Lib
                 //    break;
                 default:
                     Console.WriteLine(operation);
+                    succes = false;
                     break;
+            }
+            if (succes)
+            {
+                if (UUIDParser.UpdateUUID(user))
+                {
+                    Producer.MessageUserQueue(ObjectToXML(user));
+                }
             }
         }
         public static string ReadXMLOperation(string xml)
@@ -93,9 +107,7 @@ namespace Lib
         }
 
         public static string ObjectToXML(User user)
-        {
-            // First write something so that there is something to read ...  
-            //var user = new User { UserData = new UserData { FirstName = "Anakin", LastName = "Delabelle", Email = "anakin.delabelle@student.ehb.be", Role = "student" } };
+        { 
             var serializer = new XmlSerializer(typeof(User));
             var writer = new StringWriter();
 

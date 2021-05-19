@@ -12,9 +12,9 @@ namespace Lib.UUIDFlow
         public static string GetGUIDFromUUID(MySqlConnection conn, string uuid)
         {
             var query = "SELECT";
-            var command = new MySqlCommand(query, conn);
-            var reader = command.ExecuteReader();
-            Console.WriteLine("");
+            //var command = new MySqlCommand(query, conn);
+            //var reader = command.ExecuteReader();
+            //Console.WriteLine("");
             return "";
         }
         public static bool IsUserInUUID(UUIDConnection conn, string uuid)
@@ -23,15 +23,14 @@ namespace Lib.UUIDFlow
         }
         public static string GenerateUUID()
         {
-            return "";
+            return Guid.NewGuid().ToString();
         }
-        public static string UpdateUUID()
+        public static bool UpdateUUID(User user)
         {
             /* Change:  
-                -UUID string 
                 -Version number
             */
-            return "";
+            return true;
         }
         public static bool CheckUUID()
         {

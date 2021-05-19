@@ -34,7 +34,7 @@ namespace Lib
 
                 channel.QueueBind(queue: queueName,
                                   exchange: "direct_logs",
-                                  routingKey: "user");
+                                  routingKey: "ClientRequest");
                 Console.WriteLine(" [*] Waiting for messages.");
 
                 var consumer = new EventingBasicConsumer(channel);

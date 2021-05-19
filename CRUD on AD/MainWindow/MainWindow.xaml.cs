@@ -54,9 +54,11 @@ namespace MainWindow
             {
                 try
                 {
-                    if (Program.CreateUser(w.Answer.UserObjectToADObject()))
+                    var user = w.Answer;
+                    user.MetaData = new MetaData { Methode = CRUDMethode.CREATE, Origin = "AD", TimeStamp = DateTime.Now, UUIDMaster = "NOT SET" };
+                    if (Producer.MessageADQueue(XMLParser.ObjectToXML(user)))
                     {
-                        MessageBox.Show("User succesfully created!");
+                        MessageBox.Show("User send created!");
                         btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
                     }
                 }
@@ -89,7 +91,11 @@ namespace MainWindow
             if (fieldResults.SelectedIndex != -1)
             {
                 Debug.WriteLine(fieldResults.SelectedValue.ToString());
-                if (Program.DeleteUser(fieldResults.SelectedValue.ToString()))
+
+                var user = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToUserObject();
+                user.MetaData = new MetaData { GUID = user.MetaData.GUID, Methode = CRUDMethode.DELETE, Origin = "AD", TimeStamp = DateTime.Now, UUIDMaster = user.MetaData.UUIDMaster };
+
+                if (Producer.MessageADQueue(XMLParser.ObjectToXML(user)))
                 {
                     MessageBox.Show("User succesfully deleted!");
                     btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
@@ -114,9 +120,10 @@ namespace MainWindow
                     Debug.WriteLine(fieldResults.SelectedValue.ToString());
                     //try
                     //{
-                        if (Program.UpdateUser(oldUser.UserObjectToADObject(), w.Answer.UserObjectToADObject()))
+                        var user = w.Answer;
+                        if (Producer.MessageADQueue(XMLParser.ObjectToXML(user)))
                         {
-                            MessageBox.Show("User succesfully updated!");
+                            MessageBox.Show("Updated user succesfully send!");
                             btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
                         }
                     //}
