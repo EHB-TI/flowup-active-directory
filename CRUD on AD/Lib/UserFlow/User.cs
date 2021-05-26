@@ -13,8 +13,8 @@ namespace Lib
 
         public User()
         {
-            UserData = new UserData { FirstName = "Not Set", LastName = "Not Set", Email = "Not Set", Role = "Not Set", Password = "Student1" };
-            MetaData = new MetaData { UUIDMaster = "Not Set", Methode = CRUDMethode.NOTSET, Origin = "Not Set", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") };
+            UserData = new UserData { FirstName = "Not Set", LastName = "Not Set", Email = "Not Set", Role = "Not Set", Password = "Student1", BirthDay = "1/1/2021", Study="Not Set" };
+            MetaData = new MetaData { UUIDMaster = "Not Set", Methode = CRUDMethode.NOTSET, Origin = "Not Set", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), Version = -1 };
         }
 
         public override string ToString()
@@ -49,9 +49,13 @@ namespace Lib
         public string Password { get; set; }
         [XmlElement("email")]
         public string Email { get; set; }
+        [XmlElement("birthday")]
+        public string BirthDay { get; set; }
         [XmlElement("role")]
         public string Role { get; set; }
-    }
+        [XmlElement("study")]
+        public string Study { get; set; }
+    }   
 
     public enum CRUDMethode
     {

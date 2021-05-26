@@ -5,25 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InputWindow"
         mc:Ignorable="d"
-        Title="User Input" Height="287.29" Width="252.092">
-    <Grid Margin="0,0,2,-1">
+        Title="User Input" Height="316.333" Width="252.092">
+    <Grid Margin="0,0,2,1">
         <TextBox x:Name="txtFirstName" HorizontalAlignment="Left" Height="22" Margin="90,19,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136" TextChanged="ChangedInput"/>
         <Label Content="First Name" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="27,198,0,0" VerticalAlignment="Top" Width="91" RenderTransformOrigin="0.111,0.533" Height="34" Click="CancelAction"/>
-        <Button x:Name="btnConfirm" Content="v" HorizontalAlignment="Left" Margin="125,198,0,0" VerticalAlignment="Top" Width="91" RenderTransformOrigin="0.111,0.533" Height="34" Click="Button_Click"/>
-        <TextBox x:Name="txtLastName" HorizontalAlignment="Left" Height="22" Margin="90,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136" TextChanged="ChangedInput"/>
-        <Label Content="Last Name" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top" Width="75"/>
-        <TextBox x:Name="txtEmail" HorizontalAlignment="Left" Height="22" Margin="90,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136"/>
-        <Label Content="Email" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top" Width="75"/>
-        <Label Content="Role" HorizontalAlignment="Left" Margin="10,108,0,0" VerticalAlignment="Top" Width="75"/>
-        <TextBox x:Name="txtPassword" HorizontalAlignment="Left" Height="22" Margin="90,155,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136"/>
-        <Label Content="Password" HorizontalAlignment="Left" Margin="10,151,0,0" VerticalAlignment="Top" Width="75"/>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="3" Margin="16,143,0,0" VerticalAlignment="Top" Width="210"/>
-        <StackPanel x:Name="fldRole" Orientation="Horizontal" Margin="89,116,0,111">
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="29,235,0,0" VerticalAlignment="Top" Width="91" RenderTransformOrigin="0.111,0.533" Height="34" Click="CancelAction"/>
+        <Button x:Name="btnConfirm" Content="v" HorizontalAlignment="Left" Margin="127,235,0,0" VerticalAlignment="Top" Width="91" RenderTransformOrigin="0.111,0.533" Height="34" Click="Button_Click"/>
+        <TextBox x:Name="txtLastName" HorizontalAlignment="Left" Height="22" Margin="90,46,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136" TextChanged="ChangedInput"/>
+        <Label Content="Last Name" HorizontalAlignment="Left" Margin="10,42,0,0" VerticalAlignment="Top" Width="75"/>
+        <TextBox x:Name="txtEmail" HorizontalAlignment="Left" Height="22" Margin="90,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136"/>
+        <Label Content="Email" HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top" Width="75"/>
+        <Label Content="Role" HorizontalAlignment="Left" Margin="8,151,0,0" VerticalAlignment="Top" Width="75"/>
+        <TextBox x:Name="txtPassword" HorizontalAlignment="Left" Height="22" Margin="92,192,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136"/>
+        <Label Content="Password" HorizontalAlignment="Left" Margin="12,188,0,0" VerticalAlignment="Top" Width="75"/>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="3" Margin="16,185,0,0" VerticalAlignment="Top" Width="210"/>
+        <StackPanel x:Name="fldRole" Orientation="Horizontal" Margin="91,157,-2,110">
             <RadioButton Width="70" Content="Student" x:Name="rdStudent"/>
-            <RadioButton Width="61" Content="Docent" x:Name="rdDocent"/>
+            <RadioButton Width="70" Content="Tutor" x:Name="rdDocent"/>
 
         </StackPanel>
+        <DatePicker SelectedDate="2000-12-31" x:Name="txtBirthday" HorizontalAlignment="Left" Height="22" Margin="90,98,0,0" VerticalAlignment="Top" Width="136"/>
+        <Label Content="Birth Day" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="75"/>
+        <TextBox x:Name="txtStudy" HorizontalAlignment="Left" Height="22" Margin="90,124,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136"/>
+        <Label Content="Study" HorizontalAlignment="Left" Margin="10,120,0,0" VerticalAlignment="Top" Width="75"/>
 
     </Grid>
 </Window>

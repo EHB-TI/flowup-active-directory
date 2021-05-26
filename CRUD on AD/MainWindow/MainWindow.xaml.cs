@@ -67,15 +67,15 @@ namespace MainWindow
                           <header>
                             <method>CREATE</method>
                             <origin>AD</origin>
-                            <version>0</version>
+                            <version>1</version>
                             <sourceEntityId>NOT SET</sourceEntityId>
-                            <timestamp>2021-05-26T15:00:32+02:00</timestamp>
+                            <timestamp>2021-05-26T15:41:01+02:00</timestamp>
                           </header>
                           <body>
                             <firstname>Test</firstname>
                             <lastname>Test</lastname>
-                            <email />
-                            <role>student</role>
+                            <email>test.test@student.dhs.be</email>
+                            <role>docent</role>
                           </body>
                         </user>
                         */
@@ -120,6 +120,22 @@ namespace MainWindow
                 if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
                 {
                     Console.WriteLine(XMLParser.ObjectToXML(user));
+                    /*
+                     <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                      <header>
+                        <method>DELETE</method>
+                        <origin>AD</origin>
+                        <version>0</version>
+                        <timestamp>2021-05-26T15:44:41+02:00</timestamp>
+                      </header>
+                      <body>
+                        <firstname>test</firstname>
+                        <lastname>d</lastname>
+                        <email>test.d@desideriushogeschool.be</email>
+                        <role>docent</role>
+                      </body>
+                    </user>
+                    */
                     MessageBox.Show("User succesfully deleted!");
                     btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
                 }
@@ -147,7 +163,25 @@ namespace MainWindow
                         if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
                         {
                             Console.WriteLine(XMLParser.ObjectToXML(user));
-                            MessageBox.Show("Updated user succesfully send!");
+
+                        /*
+                         <?xml version="1.0" encoding="utf-16"?>
+                        <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                            <header>
+                                <method>UPDATE</method>
+                                <origin>AD</origin>
+                                <version>1</version>
+                                <timestamp>2021-05-26T15:42:39+02:00</timestamp>
+                            </header>
+                            <body>
+                                <firstname>test</firstname>
+                                <lastname>up</lastname>
+                                <email>test.up@student.dhs.be</email>
+                                <role>docent</role>
+                            </body>
+                        </user>
+                         */
+                        MessageBox.Show("Updated user succesfully send!");
                             btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
                         }
                     //}

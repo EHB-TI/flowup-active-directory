@@ -18,11 +18,14 @@ namespace Lib
                     FirstName = adUser.GivenName,
                     LastName = adUser.SN,
                     Email = adUser.Mail,
-                    Role = adUser.Role
+                    Role = adUser.Role,
+                    Study = adUser.Study,
+                    BirthDay = adUser.BirthDay
                 },
                 MetaData = new MetaData
                 {
                     GUID = adUser.ObjectGUID,
+                    Version = adUser.ObjectVersion
                 }
             };
         }
@@ -39,7 +42,10 @@ namespace Lib
                 Mail = $"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant().Replace(" ", ".")}@desideriushogeschool.be",
                 SAMAccountName = $"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant().Replace(" ", ".")}",
                 Role = user.UserData.Role,
-                ObjectGUID = user.MetaData.GUID
+                ObjectGUID = user.MetaData.GUID,
+                Study = user.UserData.Study,
+                BirthDay = user.UserData.BirthDay,
+                ObjectVersion = user.MetaData.Version
             };
         }
         public static void AssignADObjectAttributesToDirectoryEntry(this ADUser adUser, DirectoryEntry entry)
@@ -51,6 +57,10 @@ namespace Lib
             entry.Properties["role"].Value = adUser.Role;
             entry.Properties["sAMAccountName"].Value = adUser.SAMAccountName;
             entry.Properties["userPrincipalName"].Value = adUser.UserPrincipalName;
+            //Add Custom Attributes: [study, birthday, objectVersion]
+            entry.Properties["study"].Value = adUser.Study;
+            entry.Properties["birthday"].Value = adUser.BirthDay;
+            entry.Properties["objectVersion"].Value = adUser.ObjectVersion.ToString();
         }
         public static ADUser DirectoryEntryToADObject(this DirectoryEntry entry)
         {
@@ -64,7 +74,10 @@ namespace Lib
                 UserPrincipalName = (string)entry.Properties["userPrincipalName"].Value,
                 Mail = (string)entry.Properties["mail"].Value,
                 DisplayName = (string)entry.Properties["displayName"].Value,
-                SAMAccountName = (string)entry.Properties["sAMAccountName"].Value
+                SAMAccountName = (string)entry.Properties["sAMAccountName"].Value,
+                Study = (string)entry.Properties["study"].Value,
+                BirthDay = (string)entry.Properties["birthday"].Value,
+                ObjectVersion = (int)entry.Properties["objectVersion"].Value
             };
         }
     }

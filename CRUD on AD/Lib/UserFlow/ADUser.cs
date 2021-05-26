@@ -19,5 +19,8 @@ namespace Lib
         public string Role { get; set; } //Student or Docent
         public string SAMAccountName { get; set; } //AccountNameIdentifier before 2000
         public string ObjectGUID { get; set; } //Unique Identifier
+        public string BirthDay { get; set; } //Birthday
+        public int ObjectVersion { get; set; }  //Iterative Version ID
+        public string Study { get; set; }   //Study Direction
     }
 }

@@ -12,7 +12,7 @@ namespace InputWindow
     {
         public MetaData Data { get; set; }
         public int Version { get; set; }    
-        public User Answer { get { return new User { UserData = new UserData { FirstName = txtFirstName.Text, LastName = txtLastName.Text, Email = txtEmail.Text, Role = (rdStudent.IsChecked == true) ? "student" : "docent", Password = txtPassword.Text }, MetaData = Data}; } }
+        public User Answer { get { return new User { UserData = new UserData { FirstName = txtFirstName.Text, LastName = txtLastName.Text, Email = txtEmail.Text, BirthDay = txtBirthday.SelectedDate.ToString(), Study = txtStudy.Text ,Role = (rdStudent.IsChecked == true) ? "student" : "tutor", Password = txtPassword.Text }, MetaData = Data}; } }
 
         public DialogWindow()
         {   
@@ -37,6 +37,8 @@ namespace InputWindow
             txtLastName.Text = user.UserData.LastName;
             txtEmail.Text = user.UserData.Email;
             txtEmail.IsReadOnly = true;
+            txtBirthday.SelectedDate = DateTime.Parse(user.UserData.BirthDay);
+            txtStudy.Text = user.UserData.Study;
             if (user.UserData.Role == "student") { rdStudent.IsChecked = true; } else { rdDocent.IsChecked = true; }
             txtPassword.Text = user.UserData.Password;
 
@@ -56,7 +58,14 @@ namespace InputWindow
         private void ChangedInput(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             Console.WriteLine("Changed");
-            txtEmail.Text = $"{txtFirstName.Text}.{txtLastName.Text}@student.dhs.be";
+            if (txtLastName.Text.Length != 0 )
+            {
+                txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}.{txtLastName.Text.ToLowerInvariant()}@student.dhs.be";
+            } 
+            else
+            {
+                txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}@student.dhs.be";
+            }
         }
     }
 }
