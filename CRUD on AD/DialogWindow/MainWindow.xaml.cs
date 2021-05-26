@@ -17,7 +17,7 @@ namespace InputWindow
         {   
             InitializeComponent();
 
-            Data = new MetaData { Methode = CRUDMethode.CREATE, Origin = "AD", TimeStamp = DateTime.Now, UUIDMaster = "NOT SET", GUID = "NOT SET"};
+            Data = new MetaData { Methode = CRUDMethode.CREATE, Origin = "AD", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), GUID = "NOT SET"};
 
             txtEmail.IsEnabled = false;
             
@@ -28,7 +28,7 @@ namespace InputWindow
         {
             InitializeComponent();
 
-            Data = new MetaData { Methode = CRUDMethode.UPDATE, Origin = "AD", TimeStamp = DateTime.Now, UUIDMaster = user.MetaData.UUIDMaster, GUID = user.MetaData.GUID};
+            Data = new MetaData { Methode = CRUDMethode.UPDATE, Origin = "AD", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), GUID = user.MetaData.GUID};
 
             rdDocent.IsChecked = rdStudent.IsChecked = false;
 

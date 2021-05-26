@@ -41,7 +41,7 @@ namespace TestENV
                     UUIDMaster = "333ade47-03d1-40bb-9912-9a6c86a60169",
                     Methode = CRUDMethode.CREATE,
                     Origin = "CANVAS",
-                    TimeStamp = DateTime.Now
+                    TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K")
                 }
             };
             Console.ReadLine();

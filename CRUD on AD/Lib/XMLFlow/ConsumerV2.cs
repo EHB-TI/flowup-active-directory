@@ -12,6 +12,12 @@ namespace Lib.XMLFlow
 {
     class ConsumerV2
     {
+        public static CRUD CRUD { get; set; }
+        public ConsumerV2()
+        {
+            CRUD = new CRUD();
+            CRUD.Binding(Lib.Connection.LOCAL);
+        }
         public static void getMessage()
         {
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
@@ -55,13 +61,19 @@ namespace Lib.XMLFlow
                     {
                         Console.WriteLine("valid");
 
-                        XDocument xmlUser = XDocument.Parse(message);
 
-                        string xmlsend = createUserXml(xmlUser);
-                        Console.WriteLine("---------------");
-                        Console.WriteLine(xmlsend);
-                        //send
-                        ProducerV2.send(xmlsend, Severity.user.ToString());
+                        //Get CRUD Operation and tranfser to functionality
+                        if (XMLParser.ReadXMLTag(message, "origin") == "AD")
+                        {
+                            XMLParser.ReadXMLTag(message, "method").OperationToCRUD(XMLParser.XMLToObject(message), CRUD);
+                        }
+                        else if (XMLParser.ReadXMLTag(message, "origin") == "UUID")
+                        {
+                            var user = XMLParser.XMLToObject(message);
+                            user.MetaData.Origin = "AD";
+                            user.MetaData.TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K");
+                            ProducerV2.send(XMLParser.ObjectToXML(user), Severity.user.ToString());
+                        }
                     }
                     else
                     {

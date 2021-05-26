@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Lib.UserFlow
 {
-    enum Severity
+    public enum Severity
     {
-        UUID, user
+        UUID, user, AD
     }
 }

@@ -7,9 +7,9 @@ using RabbitMQ.Client;
 
 namespace Lib.XMLFlow
 {
-    class ProducerV2
+    public class ProducerV2
     {
-        public static void send(string message, string severity)
+        public static bool send(string message, string severity)
         {
 
             Thread.Sleep(2000);
@@ -59,11 +59,12 @@ namespace Lib.XMLFlow
 
                     XDocument doc = XDocument.Parse(message);
 
-
+                    return true;
                 }
                 else
                 {
                     Console.WriteLine("not valid");
+                   
                 }
 
 
@@ -77,6 +78,7 @@ namespace Lib.XMLFlow
 
             Console.WriteLine(" Press [enter] to exit.");
             Console.ReadLine();
+            return false;
         }
     }
 }

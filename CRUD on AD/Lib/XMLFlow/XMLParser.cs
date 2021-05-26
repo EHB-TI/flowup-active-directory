@@ -9,12 +9,13 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Lib.UUIDFlow;
+using Lib.XMLFlow;
 
 namespace Lib
 {
     public static class XMLParser
     {
-        public static void OperationToCRUD(this string operation, User user, CRUD crudInstance, UUIDConnection conn) 
+        public static void OperationToCRUD(this string operation, User user, CRUD crudInstance) 
         {
             bool succes;
             var adUser = user.UserObjectToADObject();
@@ -31,7 +32,7 @@ namespace Lib
                     succes = crudInstance.DeleteUser(adUser.CN);
                     break;
                 case "UPDATE":
-                    var oldUser = crudInstance.FindADUser("objectGUID=" + UUIDParser.GetGUIDFromUUID(conn.Conn, user.MetaData.UUIDMaster));//Get GUID -> Search AD with GUID -> Convert DirectoryEntry to ADUserObject
+                    var oldUser = crudInstance.FindADUser("objectGUID="+user.MetaData.GUID);//Get GUID -> Search AD with GUID -> Convert DirectoryEntry to ADUserObject
                     succes = crudInstance.UpdateUser(oldUser, user.UserObjectToADObject());
                     break;
                 //case "READ":
@@ -45,18 +46,15 @@ namespace Lib
             }
             if (succes)
             {
-                if (UUIDParser.UpdateUUID(user))
-                {
-                    Producer.MessageUserQueue(ObjectToXML(user));
-                }
+                Uuid.Update(ObjectToXML(user));
             }
         }
-        public static string ReadXMLOperation(string xml)
+        public static string ReadXMLTag(string xml, string tag)
         {
             var schema = new XmlSchemaSet();
             var xmlDoc = XDocument.Parse(xml);
             var row = xmlDoc.Descendants().Where(x => x.Name.LocalName == "user").First();
-            var operation = GetSubElementValue(row, "method");
+            var operation = GetSubElementValue(row, tag);
             Console.WriteLine(operation);
 
             return (string)operation;

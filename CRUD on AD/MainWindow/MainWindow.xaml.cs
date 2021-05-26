@@ -4,6 +4,8 @@ using System.Windows;
 using Lib;
 using InputWindow;
 using System.Diagnostics;
+using Lib.XMLFlow;
+using Lib.UserFlow;
 
 namespace MainWindow
 {
@@ -55,8 +57,7 @@ namespace MainWindow
                 try
                 {
                     var user = w.Answer;
-                    user.MetaData = new MetaData { Methode = CRUDMethode.CREATE, Origin = "AD", TimeStamp = DateTime.Now, UUIDMaster = "NOT SET" };
-                    if (Producer.MessageADQueue(XMLParser.ObjectToXML(user)))
+                    if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
                     {
                         MessageBox.Show("User send created!");
                         btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
@@ -93,9 +94,9 @@ namespace MainWindow
                 Debug.WriteLine(fieldResults.SelectedValue.ToString());
 
                 var user = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToUserObject();
-                user.MetaData = new MetaData { GUID = user.MetaData.GUID, Methode = CRUDMethode.DELETE, Origin = "AD", TimeStamp = DateTime.Now, UUIDMaster = user.MetaData.UUIDMaster };
+                user.MetaData = new MetaData { GUID = user.MetaData.GUID, Methode = CRUDMethode.DELETE, Origin = "AD", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") };
 
-                if (Producer.MessageADQueue(XMLParser.ObjectToXML(user)))
+                if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
                 {
                     MessageBox.Show("User succesfully deleted!");
                     btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
@@ -121,7 +122,7 @@ namespace MainWindow
                     //try
                     //{
                         var user = w.Answer;
-                        if (Producer.MessageADQueue(XMLParser.ObjectToXML(user)))
+                        if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
                         {
                             MessageBox.Show("Updated user succesfully send!");
                             btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;

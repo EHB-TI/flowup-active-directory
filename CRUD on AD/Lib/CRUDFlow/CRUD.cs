@@ -45,6 +45,8 @@ namespace Lib
                 //Set:  Name, CN,
                 //Not Set:  SN, sAMAccountName, Email, Role, GivenName, DisplayName
                 var entry = RootOU.Children.Add(adUser.CN, "user");
+                entry.Invoke("SetPassword", new object[] { adUser.UserPassword });
+                entry.Properties["LockOutTime"].Value = 0; //unlock account
                 adUser.AssignADObjectAttributesToDirectoryEntry(entry);
 
                 entry.CommitChanges();

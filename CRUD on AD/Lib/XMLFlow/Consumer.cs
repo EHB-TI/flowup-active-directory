@@ -13,14 +13,10 @@ namespace Lib
      public class Consumer
     {
         public CRUD CRUD { get; set; }
-        public UUIDConnection UConnection { get; set; }
-
         public Consumer()
         {
             CRUD = new CRUD();
             CRUD.Binding(Lib.Connection.LOCAL);
-
-            UConnection = new UUIDConnection();
         }
         public void ConsumeMessage()
         {
@@ -46,9 +42,7 @@ namespace Lib
                     Console.WriteLine(" [x] Received '{0}':'{1}'",
                                       routingKey, message);
 
-                    //Get CRUD Operation and tranfser to functionality
-                    XMLParser.ReadXMLOperation(message).OperationToCRUD(XMLParser.XMLToObject(message), CRUD, UConnection);
-
+                    
                     //if (routingKey == "user")
                     //{
                     //    Console.WriteLine("user");

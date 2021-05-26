@@ -14,7 +14,7 @@ namespace Lib
         public User()
         {
             UserData = new UserData { FirstName = "Not Set", LastName = "Not Set", Email = "Not Set", Role = "Not Set", Password = "Student1" };
-            MetaData = new MetaData { UUIDMaster = "Not Set", Methode = CRUDMethode.NOTSET, Origin = "Not Set", TimeStamp = DateTime.MinValue };
+            MetaData = new MetaData { UUIDMaster = "Not Set", Methode = CRUDMethode.NOTSET, Origin = "Not Set", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") };
         }
 
         public override string ToString()
@@ -31,10 +31,12 @@ namespace Lib
         public CRUDMethode Methode { get; set; }
         [XmlElement("origin")]
         public string Origin { get; set; }
-        [XmlElement("timestamp")]
-        public DateTime TimeStamp { get; set; }
-        [XmlIgnore]
+        [XmlElement("version")]
+        public int Version { get; set; }
+        [XmlElement("sourceEntityId")]
         public string GUID { get; set; }    
+        [XmlElement("timestamp")]
+        public string TimeStamp { get; set; }
     }
 
     public class UserData
