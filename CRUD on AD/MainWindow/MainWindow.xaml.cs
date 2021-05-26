@@ -59,6 +59,27 @@ namespace MainWindow
                     var user = w.Answer;
                     if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
                     {
+                        Console.WriteLine(XMLParser.ObjectToXML(user));
+                        //XML Object Send over AD Queueu
+                        /*
+                        <?xml version="1.0" encoding="utf-16"?>
+                        <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                          <header>
+                            <method>CREATE</method>
+                            <origin>AD</origin>
+                            <version>0</version>
+                            <sourceEntityId>NOT SET</sourceEntityId>
+                            <timestamp>2021-05-26T15:00:32+02:00</timestamp>
+                          </header>
+                          <body>
+                            <firstname>Test</firstname>
+                            <lastname>Test</lastname>
+                            <email />
+                            <role>student</role>
+                          </body>
+                        </user>
+                        */
+
                         MessageBox.Show("User send created!");
                         btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
                     }
@@ -98,6 +119,7 @@ namespace MainWindow
 
                 if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
                 {
+                    Console.WriteLine(XMLParser.ObjectToXML(user));
                     MessageBox.Show("User succesfully deleted!");
                     btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
                 }
@@ -124,6 +146,7 @@ namespace MainWindow
                         var user = w.Answer;
                         if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
                         {
+                            Console.WriteLine(XMLParser.ObjectToXML(user));
                             MessageBox.Show("Updated user succesfully send!");
                             btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
                         }

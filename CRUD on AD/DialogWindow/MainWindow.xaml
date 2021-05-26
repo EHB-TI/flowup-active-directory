@@ -7,11 +7,11 @@
         mc:Ignorable="d"
         Title="User Input" Height="287.29" Width="252.092">
     <Grid Margin="0,0,2,-1">
-        <TextBox x:Name="txtFirstName" HorizontalAlignment="Left" Height="22" Margin="90,19,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136"/>
+        <TextBox x:Name="txtFirstName" HorizontalAlignment="Left" Height="22" Margin="90,19,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136" TextChanged="ChangedInput"/>
         <Label Content="First Name" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="75"/>
         <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="27,198,0,0" VerticalAlignment="Top" Width="91" RenderTransformOrigin="0.111,0.533" Height="34" Click="CancelAction"/>
         <Button x:Name="btnConfirm" Content="v" HorizontalAlignment="Left" Margin="125,198,0,0" VerticalAlignment="Top" Width="91" RenderTransformOrigin="0.111,0.533" Height="34" Click="Button_Click"/>
-        <TextBox x:Name="txtLastName" HorizontalAlignment="Left" Height="22" Margin="90,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136"/>
+        <TextBox x:Name="txtLastName" HorizontalAlignment="Left" Height="22" Margin="90,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136" TextChanged="ChangedInput"/>
         <Label Content="Last Name" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top" Width="75"/>
         <TextBox x:Name="txtEmail" HorizontalAlignment="Left" Height="22" Margin="90,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136"/>
         <Label Content="Email" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top" Width="75"/>

@@ -11,13 +11,14 @@ namespace InputWindow
     public partial class DialogWindow : Window
     {
         public MetaData Data { get; set; }
+        public int Version { get; set; }    
         public User Answer { get { return new User { UserData = new UserData { FirstName = txtFirstName.Text, LastName = txtLastName.Text, Email = txtEmail.Text, Role = (rdStudent.IsChecked == true) ? "student" : "docent", Password = txtPassword.Text }, MetaData = Data}; } }
 
         public DialogWindow()
         {   
             InitializeComponent();
 
-            Data = new MetaData { Methode = CRUDMethode.CREATE, Origin = "AD", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), GUID = "NOT SET"};
+            Data = new MetaData { Methode = CRUDMethode.CREATE, Origin = "AD", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), GUID = "NOT SET", Version = 1};
 
             txtEmail.IsEnabled = false;
             
@@ -28,7 +29,7 @@ namespace InputWindow
         {
             InitializeComponent();
 
-            Data = new MetaData { Methode = CRUDMethode.UPDATE, Origin = "AD", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), GUID = user.MetaData.GUID};
+            Data = new MetaData { Methode = CRUDMethode.UPDATE, Origin = "AD", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), GUID = user.MetaData.GUID, Version = user.MetaData.Version + 1};
 
             rdDocent.IsChecked = rdStudent.IsChecked = false;
 
@@ -52,6 +53,10 @@ namespace InputWindow
             this.DialogResult = false;
         }
 
-
+        private void ChangedInput(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            Console.WriteLine("Changed");
+            txtEmail.Text = $"{txtFirstName.Text}.{txtLastName.Text}@student.dhs.be";
+        }
     }
 }
