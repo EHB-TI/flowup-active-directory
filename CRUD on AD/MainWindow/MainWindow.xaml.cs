@@ -69,13 +69,15 @@ namespace MainWindow
                             <origin>AD</origin>
                             <version>1</version>
                             <sourceEntityId>NOT SET</sourceEntityId>
-                            <timestamp>2021-05-26T15:41:01+02:00</timestamp>
+                            <timestamp>2021-05-27T11:45:57+02:00</timestamp>
                           </header>
                           <body>
                             <firstname>Test</firstname>
-                            <lastname>Test</lastname>
-                            <email>test.test@student.dhs.be</email>
-                            <role>docent</role>
+                            <lastname>User</lastname>
+                            <email>test.user@student.dhs.be</email>
+                            <birthday>2000-12-06</birthday>
+                            <role>student</role>
+                            <study>DigX</study>
                           </body>
                         </user>
                         */

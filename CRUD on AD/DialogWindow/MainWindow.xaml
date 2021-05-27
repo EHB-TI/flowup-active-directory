@@ -19,7 +19,7 @@
         <TextBox x:Name="txtPassword" HorizontalAlignment="Left" Height="22" Margin="92,192,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="136"/>
         <Label Content="Password" HorizontalAlignment="Left" Margin="12,188,0,0" VerticalAlignment="Top" Width="75"/>
         <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="3" Margin="16,185,0,0" VerticalAlignment="Top" Width="210"/>
-        <StackPanel x:Name="fldRole" Orientation="Horizontal" Margin="91,157,-2,110">
+        <StackPanel x:Name="fldRole" Orientation="Horizontal" Margin="91,157,-2.4,97.4">
             <RadioButton Width="70" Content="Student" x:Name="rdStudent"/>
             <RadioButton Width="70" Content="Tutor" x:Name="rdDocent"/>
 

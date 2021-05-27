@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Lib;
+using Lib.XMLFlow;
 
 namespace TestConsumer
 {
@@ -13,9 +14,7 @@ namespace TestConsumer
         {
             Console.WriteLine("Initializing Consumer...");
 
-            var consumer = new Consumer();
-
-            consumer.ConsumeMessage();
+            ConsumerV2.getMessage();
         }
     }
 }

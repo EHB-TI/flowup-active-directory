@@ -17,6 +17,7 @@ namespace Lib
     {
         public static void OperationToCRUD(this string operation, User user, CRUD crudInstance) 
         {
+            Debug.WriteLine("OperationTOcrud");
             bool succes;
             var adUser = user.UserObjectToADObject();
             switch (operation.ToUpperInvariant())
@@ -47,6 +48,27 @@ namespace Lib
             if (succes)
             {
                 Uuid.Update(ObjectToXML(user));
+                /*
+                 <?xml version="1.0" encoding="utf-16"?>
+                <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                  <header>
+                    <method>CREATE</method>
+                    <origin>AD</origin>
+                    <version>1</version>
+                    <sourceEntityId>NOT SET</sourceEntityId>
+                    <timestamp>2021-05-27T15:16:40+02:00</timestamp>
+                  </header>
+                  <body>
+                    <firstname>Test</firstname>
+                    <lastname>create</lastname>
+                    <password>Student1</password>
+                    <email>test.create@student.dhs.be</email>
+                    <birthday>2000-12-31</birthday>
+                    <role>student</role>
+                    <study>DigX</study>
+                  </body>
+                </user>'
+                */
             }
         }
         public static string ReadXMLTag(string xml, string tag)
@@ -65,6 +87,11 @@ namespace Lib
             var subElement = container.Descendants().FirstOrDefault(d => d.Name.LocalName == subElementName);
             if (subElement == null) return null;
             return subElement.Value;
+        }
+        public static void RemoveXMLTag(string xml, string tag)
+        {
+            var xmlDoc = XDocument.Parse(xml);
+            xmlDoc.Descendants(tag).First().Remove();           
         }
 
         public static string ReadXMLFiletoString(string path)
@@ -104,13 +131,18 @@ namespace Lib
             return check;
         }
 
-        public static string ObjectToXML(User user)
+        public static string ObjectToXML(User user, bool hide_pass=true)
         { 
             var serializer = new XmlSerializer(typeof(User));
             var writer = new StringWriter();
 
             serializer.Serialize(writer, user);
             Debug.WriteLine(writer.ToString());
+
+            if (hide_pass)
+            {
+                RemoveXMLTag(writer.ToString(), "password");
+            }
 
             return writer.ToString();
         }

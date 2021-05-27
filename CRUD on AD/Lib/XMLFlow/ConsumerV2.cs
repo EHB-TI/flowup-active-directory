@@ -10,16 +10,15 @@ using RabbitMQ.Client.Events;
 
 namespace Lib.XMLFlow
 {
-    class ConsumerV2
+    public class ConsumerV2
     {
         public static CRUD CRUD { get; set; }
-        public ConsumerV2()
+        
+        public static void getMessage()
         {
             CRUD = new CRUD();
             CRUD.Binding(Lib.Connection.LOCAL);
-        }
-        public static void getMessage()
-        {
+
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
@@ -32,7 +31,7 @@ namespace Lib.XMLFlow
 
                 channel.QueueBind(queue: queueName,
                                   exchange: "direct_logs",
-                                  routingKey: "AD");
+                                  routingKey: Severity.AD.ToString());
                 Console.WriteLine(" [*] Waiting for messages.");
 
                 var consumer = new EventingBasicConsumer(channel);
@@ -57,7 +56,7 @@ namespace Lib.XMLFlow
 
 
 
-                    if (xmlValidation)
+                    if (true) //Has to change
                     {
                         Console.WriteLine("valid");
 

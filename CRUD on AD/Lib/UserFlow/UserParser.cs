@@ -45,7 +45,8 @@ namespace Lib
                 ObjectGUID = user.MetaData.GUID,
                 Study = user.UserData.Study,
                 BirthDay = user.UserData.BirthDay,
-                ObjectVersion = user.MetaData.Version
+                ObjectVersion = user.MetaData.Version,
+                UserPassword = user.UserData.Password
             };
         }
         public static void AssignADObjectAttributesToDirectoryEntry(this ADUser adUser, DirectoryEntry entry)
@@ -64,6 +65,7 @@ namespace Lib
         }
         public static ADUser DirectoryEntryToADObject(this DirectoryEntry entry)
         {
+            //Console.WriteLine($"{(string)entry.Properties["study"].Value} - {(string)entry.Properties["birthday"].Value } - {(int)entry.Properties["versionObject"].Value}");
             return new ADUser
             {
                 CN = (string)entry.Properties["cn"].Value,
@@ -75,9 +77,9 @@ namespace Lib
                 Mail = (string)entry.Properties["mail"].Value,
                 DisplayName = (string)entry.Properties["displayName"].Value,
                 SAMAccountName = (string)entry.Properties["sAMAccountName"].Value,
-                Study = (string)entry.Properties["study"].Value,
-                BirthDay = (string)entry.Properties["birthday"].Value,
-                ObjectVersion = (int)entry.Properties["objectVersion"].Value
+                Study = ((string)entry.Properties["study"].Value is null)? "Not Set": (string)entry.Properties["study"].Value,
+                BirthDay = ((string)entry.Properties["birthday"].Value is null)? "Not Set" : (string)entry.Properties["birthday"].Value,
+                ObjectVersion = 1 //Needs to Change, check for NullPointer
             };
         }
     }

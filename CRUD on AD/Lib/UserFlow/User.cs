@@ -45,7 +45,7 @@ namespace Lib
         public string FirstName { get; set; }
         [XmlElement("lastname")]
         public string LastName { get; set; }
-        [XmlIgnore]
+        [XmlElement("password")]
         public string Password { get; set; }
         [XmlElement("email")]
         public string Email { get; set; }

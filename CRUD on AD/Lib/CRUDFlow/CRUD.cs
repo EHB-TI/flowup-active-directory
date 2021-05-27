@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices;
-
+using System.DirectoryServices.AccountManagement;
 
 namespace Lib
 {
@@ -44,14 +44,19 @@ namespace Lib
                 //Create User object
                 //Set:  Name, CN,
                 //Not Set:  SN, sAMAccountName, Email, Role, GivenName, DisplayName
+
                 var entry = RootOU.Children.Add(adUser.CN, "user");
-                entry.Invoke("SetPassword", new object[] { adUser.UserPassword });
+                Debug.WriteLine("User Password: "+adUser.UserPassword);
                 entry.Properties["LockOutTime"].Value = 0; //unlock account
                 adUser.AssignADObjectAttributesToDirectoryEntry(entry);
 
-                entry.CommitChanges();
+                //entry.CommitChanges();
+                //Minimum 7 characters else Password Policy will interfere
+                entry.Invoke("SetPassword", new object[] { adUser.UserPassword });
 
+                entry.CommitChanges();
                 Debug.WriteLine("User Creation Succeeded!");
+                
                 return true;
             }
             return false;

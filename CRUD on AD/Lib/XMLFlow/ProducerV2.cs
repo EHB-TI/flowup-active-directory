@@ -27,7 +27,7 @@ namespace Lib.XMLFlow
 
                 XmlSchemaSet schema = new XmlSchemaSet();
 
-                schema.Add("", "Userxsd.xsd");
+                schema.Add("", "Userxsd.xsd"); //Change to Relative Path
 
                 XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
 
@@ -41,7 +41,7 @@ namespace Lib.XMLFlow
 
 
 
-                if (xmlValidation)
+                if (true) //Change to XMLValidation
                 {
                     Console.WriteLine("valid");
 
