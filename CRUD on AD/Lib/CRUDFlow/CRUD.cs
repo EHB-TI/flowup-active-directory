@@ -50,9 +50,10 @@ namespace Lib
                 entry.Properties["LockOutTime"].Value = 0; //unlock account
                 adUser.AssignADObjectAttributesToDirectoryEntry(entry);
 
-                //entry.CommitChanges();
+                entry.CommitChanges();
                 //Minimum 7 characters else Password Policy will interfere
-                entry.Invoke("SetPassword", new object[] { adUser.UserPassword });
+
+                entry.Invoke("SetPassword", new object[] { adUser.UserPassword }); //Handle Error
 
                 entry.CommitChanges();
                 Debug.WriteLine("User Creation Succeeded!");
@@ -85,9 +86,9 @@ namespace Lib
 
         public bool UpdateUser(ADUser oldUser, ADUser newUser)
         {
-            if (IsUserInAD(oldUser.CN))
+            if (IsUserInAD("CN="+oldUser.CN))
             {
-                var objUser = SetupSearcher($"(&(objectCategory=Person)({oldUser.CN}))", true).FindOne().GetDirectoryEntry();
+                var objUser = SetupSearcher($"(&(objectCategory=Person)(CN={oldUser.CN}))", true).FindOne().GetDirectoryEntry();
 
                 objUser.Rename(newUser.CN);
                 newUser.AssignADObjectAttributesToDirectoryEntry(objUser);

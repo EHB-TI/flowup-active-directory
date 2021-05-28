@@ -9,9 +9,9 @@ namespace Lib
 {
     public static class UserParser
     {
-        public static User ADObjectToUserObject(this ADUser adUser)
+        public static IntraUser ADObjectToIntraUserObject(this ADUser adUser)
         {
-            return new User
+            return new IntraUser
             {
                 UserData = new UserData
                 {
@@ -20,7 +20,8 @@ namespace Lib
                     Email = adUser.Mail,
                     Role = adUser.Role,
                     Study = adUser.Study,
-                    BirthDay = adUser.BirthDay
+                    BirthDay = adUser.BirthDay,
+                    Password = adUser.UserPassword
                 },
                 MetaData = new MetaData
                 {
@@ -29,7 +30,28 @@ namespace Lib
                 }
             };
         }
-        public static ADUser UserObjectToADObject(this User user)
+        public static ExtraUser ConvertIntraToExtra(this IntraUser user)
+        {
+            return new ExtraUser
+            {
+                UserData = new XUserData
+                {
+                    FirstName = user.UserData.FirstName,
+                    LastName = user.UserData.LastName,
+                    Email = user.UserData.Email,
+                    Role = user.UserData.Role,
+                    Study = user.UserData.Study,
+                    BirthDay = user.UserData.BirthDay
+                },
+                MetaData = new MetaData
+                {
+                    GUID = user.MetaData.GUID,
+                    Version = user.MetaData.Version,
+
+                }
+            };
+        }
+        public static ADUser IntraUserObjectToADObject(this IntraUser user)
         {
             return new ADUser
             {
@@ -49,6 +71,25 @@ namespace Lib
                 UserPassword = user.UserData.Password
             };
         }
+        public static ADUser ExtraUserObjectToADObject(this ExtraUser user)
+        {
+            return new ADUser
+            {
+                CN = $"CN={user.UserData.FirstName} {user.UserData.LastName}",
+                SN = user.UserData.LastName,
+                Name = $"{user.UserData.FirstName} {user.UserData.LastName}",
+                DisplayName = $"{user.UserData.FirstName} {user.UserData.LastName}",
+                GivenName = user.UserData.FirstName,
+                UserPrincipalName = $"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant().Replace(" ", ".")}@desideriushogeschool.be",
+                Mail = $"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant().Replace(" ", ".")}@desideriushogeschool.be",
+                SAMAccountName = $"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant().Replace(" ", ".")}",
+                Role = user.UserData.Role,
+                ObjectGUID = user.MetaData.GUID,
+                Study = user.UserData.Study,
+                BirthDay = user.UserData.BirthDay,
+                ObjectVersion = user.MetaData.Version
+            };
+        }
         public static void AssignADObjectAttributesToDirectoryEntry(this ADUser adUser, DirectoryEntry entry)
         {
             entry.Properties["displayName"].Value = adUser.Name;
@@ -58,15 +99,12 @@ namespace Lib
             entry.Properties["role"].Value = adUser.Role;
             entry.Properties["sAMAccountName"].Value = adUser.SAMAccountName;
             entry.Properties["userPrincipalName"].Value = adUser.UserPrincipalName;
-            //Add Custom Attributes: [study, birthday, objectVersion]
             entry.Properties["study"].Value = adUser.Study;
             entry.Properties["birthday"].Value = adUser.BirthDay;
-            entry.Properties["objectVersion"].Value = adUser.ObjectVersion.ToString();
+            entry.Properties["objectVersion"].Value = adUser.ObjectVersion;
         }
-        public static ADUser DirectoryEntryToADObject(this DirectoryEntry entry)
-        {
-            //Console.WriteLine($"{(string)entry.Properties["study"].Value} - {(string)entry.Properties["birthday"].Value } - {(int)entry.Properties["versionObject"].Value}");
-            return new ADUser
+        public static ADUser DirectoryEntryToADObject(this DirectoryEntry entry) =>
+            new ADUser
             {
                 CN = (string)entry.Properties["cn"].Value,
                 SN = (string)entry.Properties["sn"].Value,
@@ -77,10 +115,10 @@ namespace Lib
                 Mail = (string)entry.Properties["mail"].Value,
                 DisplayName = (string)entry.Properties["displayName"].Value,
                 SAMAccountName = (string)entry.Properties["sAMAccountName"].Value,
-                Study = ((string)entry.Properties["study"].Value is null)? "Not Set": (string)entry.Properties["study"].Value,
-                BirthDay = ((string)entry.Properties["birthday"].Value is null)? "Not Set" : (string)entry.Properties["birthday"].Value,
-                ObjectVersion = 1 //Needs to Change, check for NullPointer
+                Study = ((string)entry.Properties["study"].Value is null) ? "Not Set" : (string)entry.Properties["study"].Value,
+                BirthDay = ((string)entry.Properties["birthday"].Value is null) ? "Not Set" : (string)entry.Properties["birthday"].Value,
+                ObjectVersion = (int?)entry.Properties["objectVersion"].Value is null? -1 : (int)entry.Properties["objectVersion"].Value, //Needs to Change, check for NullPointer
+                ObjectGUID = new Guid((byte[])entry.Properties["objectGUID"].Value).ToString()
             };
-        }
     }
 }

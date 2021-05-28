@@ -57,9 +57,9 @@ namespace MainWindow
                 try
                 {
                     var user = w.Answer;
-                    if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
+                    if (ProducerV2.send(XMLParser.IntraObjectToXML(user), Severity.AD.ToString()))
                     {
-                        Console.WriteLine(XMLParser.ObjectToXML(user));
+                        Console.WriteLine(XMLParser.IntraObjectToXML(user));
                         //XML Object Send over AD Queueu
                         /*
                         <?xml version="1.0" encoding="utf-16"?>
@@ -68,18 +68,18 @@ namespace MainWindow
                             <method>CREATE</method>
                             <origin>AD</origin>
                             <version>1</version>
-                            <sourceEntityId>NOT SET</sourceEntityId>
-                            <timestamp>2021-05-27T11:45:57+02:00</timestamp>
+                            <sourceEntityId>339f133f-647f-4481-982a-4b0db8ee0c7e</sourceEntityId>
+                            <timestamp>2021-05-28T11:40:16+02:00</timestamp>
                           </header>
                           <body>
                             <firstname>Test</firstname>
-                            <lastname>User</lastname>
-                            <email>test.user@student.dhs.be</email>
-                            <birthday>2000-12-06</birthday>
+                            <lastname>Everything</lastname>
+                            <email>test.everything@student.dhs.be</email>
+                            <birthday>2000-07-05</birthday>
                             <role>student</role>
-                            <study>DigX</study>
+                            <study>Digx</study>
                           </body>
-                        </user>
+                        </user>'
                         */
 
                         MessageBox.Show("User send created!");
@@ -116,12 +116,12 @@ namespace MainWindow
             {
                 Debug.WriteLine(fieldResults.SelectedValue.ToString());
 
-                var user = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToUserObject();
+                var user = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToIntraUserObject();
                 user.MetaData = new MetaData { GUID = user.MetaData.GUID, Methode = CRUDMethode.DELETE, Origin = "AD", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") };
 
-                if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
+                if (ProducerV2.send(XMLParser.IntraObjectToXML(user), Severity.AD.ToString()))
                 {
-                    Console.WriteLine(XMLParser.ObjectToXML(user));
+                    Console.WriteLine(XMLParser.IntraObjectToXML(user));
                     /*
                      <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
                       <header>
@@ -152,7 +152,7 @@ namespace MainWindow
         {
             if (fieldResults.SelectedIndex != -1)
             {
-                var oldUser = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToUserObject();
+                var oldUser = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToIntraUserObject();
                 DialogWindow w = new DialogWindow(oldUser);
                 w.ShowDialog();
 
@@ -162,9 +162,9 @@ namespace MainWindow
                     //try
                     //{
                         var user = w.Answer;
-                        if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
+                        if (ProducerV2.send(XMLParser.IntraObjectToXML(user), Severity.AD.ToString()))
                         {
-                            Console.WriteLine(XMLParser.ObjectToXML(user));
+                            Console.WriteLine(XMLParser.IntraObjectToXML(user));
 
                         /*
                          <?xml version="1.0" encoding="utf-16"?>

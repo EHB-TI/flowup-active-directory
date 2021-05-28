@@ -15,26 +15,33 @@ namespace Lib
 {
     public static class XMLParser
     {
-        public static void OperationToCRUD(this string operation, User user, CRUD crudInstance) 
+        public static void OperationToCRUD(this string operation, IntraUser user, CRUD crudInstance) 
         {
             Debug.WriteLine("OperationTOcrud");
             bool succes;
-            var adUser = user.UserObjectToADObject();
+            var adUser = user.IntraUserObjectToADObject();
             switch (operation.ToUpperInvariant())
             {
                 case "CREATE":
-                    succes = crudInstance.CreateUser(user.UserObjectToADObject());
-                    if (crudInstance.IsUserInAD(adUser.CN) && user.MetaData.GUID == "Not Set")
+                    succes = crudInstance.CreateUser(user.IntraUserObjectToADObject());
+                    if (crudInstance.IsUserInAD(adUser.CN))
                     {
+                        Debug.WriteLine("Searching for GUID");
                         user.MetaData.GUID = crudInstance.FindADUser(adUser.CN).ObjectGUID;
+                        Debug.WriteLine("GUID: "+user.MetaData.GUID);
+                    }
+                    else
+                    {
+                        throw new Exception("Newly created user can not be found!");
                     }
                     break;
                 case "DELETE":
                     succes = crudInstance.DeleteUser(adUser.CN);
                     break;
                 case "UPDATE":
-                    var oldUser = crudInstance.FindADUser("objectGUID="+user.MetaData.GUID);//Get GUID -> Search AD with GUID -> Convert DirectoryEntry to ADUserObject
-                    succes = crudInstance.UpdateUser(oldUser, user.UserObjectToADObject());
+                    Debug.WriteLine("Searching for old user with GUID: "+ user.MetaData.GUID);
+                    var oldUser = crudInstance.FindADUser("objectGUID="+ConvertGuidToOctetString(user.MetaData.GUID));//Get GUID -> Search AD with GUID -> Convert DirectoryEntry to ADUserObject
+                    succes = crudInstance.UpdateUser(oldUser, user.IntraUserObjectToADObject());
                     break;
                 //case "READ":
                 //    break;
@@ -47,29 +54,53 @@ namespace Lib
             }
             if (succes)
             {
-                Uuid.Update(ObjectToXML(user));
+                ExtraUser outUser = user.ConvertIntraToExtra();
+                outUser.MetaData = new MetaData
+                {
+                    GUID = user.MetaData.GUID,
+                    Methode = user.MetaData.Methode,
+                    Version = user.MetaData.Version,
+                    Origin = "AD",
+                    TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K")
+                };
+                
+                Uuid.Update(ExtraObjectToXML(outUser));
                 /*
                  <?xml version="1.0" encoding="utf-16"?>
-                <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-                  <header>
-                    <method>CREATE</method>
-                    <origin>AD</origin>
-                    <version>1</version>
-                    <sourceEntityId>NOT SET</sourceEntityId>
-                    <timestamp>2021-05-27T15:16:40+02:00</timestamp>
-                  </header>
-                  <body>
-                    <firstname>Test</firstname>
-                    <lastname>create</lastname>
-                    <password>Student1</password>
-                    <email>test.create@student.dhs.be</email>
-                    <birthday>2000-12-31</birthday>
-                    <role>student</role>
-                    <study>DigX</study>
-                  </body>
-                </user>'
+                    <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                      <header>
+                        <method>CREATE</method>
+                        <origin>AD</origin>
+                        <version>1</version>
+                        <sourceEntityId>NOT SET</sourceEntityId>
+                        <timestamp>2021-05-28T10:56:48+02:00</timestamp>
+                      </header>
+                      <body>
+                        <firstname>uuid</firstname>
+                        <lastname>test</lastname>
+                        <email>uuid.test@student.dhs.be</email>
+                        <birthday>2000-12-07</birthday>
+                        <role>student</role>
+                        <study>digx</study>
+                      </body>
+                    </user>
                 */
             }
+        }
+        internal static string ConvertGuidToOctetString(string objectGuid)
+        {
+            //From: https://stackoverflow.com/questions/1545630/searching-for-a-objectguid-in-ad
+            System.Guid guid = new Guid(objectGuid);
+            byte[] byteGuid = guid.ToByteArray();
+
+            string queryGuid = "";
+
+            foreach (byte b in byteGuid)
+            {
+                queryGuid += @"\" + b.ToString("x2");
+            }
+
+            return queryGuid;
         }
         public static string ReadXMLTag(string xml, string tag)
         {
@@ -96,22 +127,35 @@ namespace Lib
 
         public static string ReadXMLFiletoString(string path)
         {
-            XmlSerializer reader = new XmlSerializer(typeof(User));
+            XmlSerializer reader = new XmlSerializer(typeof(IntraUser));
             StreamReader file = new StreamReader(path);
-            var xml = ObjectToXML((User)reader.Deserialize(file));
+            var xml = IntraObjectToXML((IntraUser)reader.Deserialize(file));
             file.Close();
             return xml;
         }
-        public static User XMLToObject(string xml)
+        public static IntraUser XMLToIntraObject(string xml)
         {
             //if (!ValidateXML(xml))   
             //{
             //    Debug.WriteLine("Ongeldige XML!!!");
             //}
 
-            var serializer = new XmlSerializer(typeof(User));
+            var serializer = new XmlSerializer(typeof(IntraUser));
             var reader = new StringReader(xml);
-            var user = (User)serializer.Deserialize(reader);
+            var user = (IntraUser)serializer.Deserialize(reader);
+
+            return user;
+        }
+        public static ExtraUser XMLToExtraObject(string xml)
+        {
+            //if (!ValidateXML(xml))   
+            //{
+            //    Debug.WriteLine("Ongeldige XML!!!");
+            //}
+
+            var serializer = new XmlSerializer(typeof(ExtraUser));
+            var reader = new StringReader(xml);
+            var user = (ExtraUser)serializer.Deserialize(reader);
 
             return user;
         }
@@ -131,18 +175,23 @@ namespace Lib
             return check;
         }
 
-        public static string ObjectToXML(User user, bool hide_pass=true)
+        public static string IntraObjectToXML(IntraUser user)
         { 
-            var serializer = new XmlSerializer(typeof(User));
+            var serializer = new XmlSerializer(typeof(IntraUser));
             var writer = new StringWriter();
 
             serializer.Serialize(writer, user);
             Debug.WriteLine(writer.ToString());
 
-            if (hide_pass)
-            {
-                RemoveXMLTag(writer.ToString(), "password");
-            }
+            return writer.ToString();
+        }
+        public static string ExtraObjectToXML(ExtraUser user)
+        {
+            var serializer = new XmlSerializer(typeof(ExtraUser));
+            var writer = new StringWriter();
+
+            serializer.Serialize(writer, user);
+            Debug.WriteLine(writer.ToString());
 
             return writer.ToString();
         }

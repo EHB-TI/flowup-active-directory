@@ -12,8 +12,9 @@ namespace InputWindow
     public partial class DialogWindow : Window
     {
         public MetaData Data { get; set; }
-        public int Version { get; set; }    
-        public User Answer { get { return new User { 
+        public int Version { get; set; }
+        public bool Create { get; set; }    
+        public IntraUser Answer { get { return new IntraUser { 
                                         UserData = new UserData 
                                         { 
                                             FirstName = txtFirstName.Text.Equals(string.Empty)
@@ -38,14 +39,16 @@ namespace InputWindow
         public DialogWindow()
         {   
             InitializeComponent();
+            Create = true;
 
-            Data = new MetaData 
-            { 
-                Methode = CRUDMethode.CREATE, 
-                Origin = "AD", 
-                TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), 
-                GUID = "NOT SET", 
-                Version = 1
+            Data = new MetaData
+            {
+                Methode = CRUDMethode.CREATE,
+                Origin = "AD",
+                TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"),
+                GUID = "NOT SET",
+                Version = 1,
+                UUIDMaster = string.Empty
             };
 
             txtEmail.IsEnabled = false;
@@ -53,10 +56,11 @@ namespace InputWindow
             btnConfirm.Content = "Create";
         }
 
-        public DialogWindow(User user)
+        public DialogWindow(IntraUser user)
         {
             InitializeComponent();
 
+            Create = false;
             Data = new MetaData 
             { 
                 Methode = CRUDMethode.UPDATE, 
@@ -90,21 +94,37 @@ namespace InputWindow
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (!txtFirstName.Text.Equals(string.Empty) && !txtPassword.Text.Equals(string.Empty))
+            if (Create)
             {
-                if (txtPassword.Text.Count(char.IsDigit) >= 1 && txtPassword.Text.Length >= 7)
+                if (!txtFirstName.Text.Equals(string.Empty) && !txtPassword.Text.Equals(string.Empty))
+                {
+                    if (txtPassword.Text.Count(char.IsDigit) >= 1 && txtPassword.Text.Length >= 7)
+                    {
+                        this.DialogResult = true;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Password needs to be 7 character long; with atleast 1 number!");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Firstname and Password are REQUIRED!");
+                }
+            }
+            else
+            {
+
+                if (!txtFirstName.Text.Equals(string.Empty))
                 {
                     this.DialogResult = true;
                 }
                 else
                 {
-                    MessageBox.Show("Password needs to be 7 character long; with atleast 1 number!");
+                    MessageBox.Show("Firstname is REQUIRED!");
                 }
             }
-            else
-            {
-                MessageBox.Show("Firstname and Password are REQUIRED!");
-            }
+            
         }
 
         private void CancelAction(object sender, RoutedEventArgs e)

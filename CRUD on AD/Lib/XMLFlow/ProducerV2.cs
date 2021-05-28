@@ -41,7 +41,7 @@ namespace Lib.XMLFlow
 
 
 
-                if (true) //Change to XMLValidation
+                if (xmlValidation) //Change to XMLValidation
                 {
                     Console.WriteLine("valid");
 
@@ -64,7 +64,6 @@ namespace Lib.XMLFlow
                 else
                 {
                     Console.WriteLine("not valid");
-                   
                 }
 
 
@@ -75,9 +74,6 @@ namespace Lib.XMLFlow
 
 
             }
-
-            Console.WriteLine(" Press [enter] to exit.");
-            Console.ReadLine();
             return false;
         }
     }

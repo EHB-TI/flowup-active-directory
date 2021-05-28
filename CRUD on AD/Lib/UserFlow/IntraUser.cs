@@ -4,14 +4,14 @@ using System.Xml.Serialization;
 namespace Lib
 {
     [XmlRoot("user")]
-    public class User
+    public class IntraUser
     {
         [XmlElement("header")]
         public MetaData MetaData { get; set; }
         [XmlElement("body")]
         public UserData UserData { get; set; }
 
-        public User()
+        public IntraUser()
         {
             UserData = new UserData { FirstName = "Not Set", LastName = "Not Set", Email = "Not Set", Role = "Not Set", Password = "Student1", BirthDay = "1/1/2021", Study="Not Set" };
             MetaData = new MetaData { UUIDMaster = "Not Set", Methode = CRUDMethode.NOTSET, Origin = "Not Set", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), Version = -1 };

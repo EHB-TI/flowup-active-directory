@@ -56,7 +56,7 @@ namespace Lib.XMLFlow
 
 
 
-                    if (true) //Has to change
+                    if (xmlValidation) //Has to change
                     {
                         Console.WriteLine("valid");
 
@@ -64,14 +64,14 @@ namespace Lib.XMLFlow
                         //Get CRUD Operation and tranfser to functionality
                         if (XMLParser.ReadXMLTag(message, "origin") == "AD")
                         {
-                            XMLParser.ReadXMLTag(message, "method").OperationToCRUD(XMLParser.XMLToObject(message), CRUD);
+                            XMLParser.ReadXMLTag(message, "method").OperationToCRUD(XMLParser.XMLToIntraObject(message), CRUD);
                         }
                         else if (XMLParser.ReadXMLTag(message, "origin") == "UUID")
                         {
-                            var user = XMLParser.XMLToObject(message);
+                            var user = XMLParser.XMLToExtraObject(message);
                             user.MetaData.Origin = "AD";
                             user.MetaData.TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K");
-                            ProducerV2.send(XMLParser.ObjectToXML(user), Severity.user.ToString());
+                            ProducerV2.send(XMLParser.ExtraObjectToXML(user), Severity.user.ToString());
                         }
                     }
                     else
