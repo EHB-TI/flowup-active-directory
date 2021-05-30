@@ -21,7 +21,7 @@ namespace MainWindow
             InitializeComponent();
 
             Program = new CRUD();
-            Program.Binding(Connection.OUTSIDE);
+            Program.Binding(Connection.LOCAL);
             lblCurrent.Content = "Current Connection: LOCAL";      //LOCAL or LDAP
             btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = btnChangeConnection.IsEnabled = false;
         }

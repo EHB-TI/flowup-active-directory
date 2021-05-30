@@ -12,6 +12,7 @@ namespace InputWindow
     public partial class DialogWindow : Window
     {
         public MetaData Data { get; set; }
+        public IntraUser User { get; set; }
         public int Version { get; set; }
         public bool Create { get; set; }    
         public IntraUser Answer { get { return new IntraUser { 
@@ -27,9 +28,12 @@ namespace InputWindow
                                             Study = txtStudy.Text.Equals(string.Empty) 
                                                 ? "Not Set" : txtStudy.Text,
                                             Role = rdStudent.IsChecked is true
-                                                ? "student" : rdDocent.IsChecked is true ? "tutor": "Not Set", 
-                                            Password = txtPassword.Text.Equals(string.Empty) 
-                                                ? "Not Set" : txtPassword.Text 
+                                                ? "student" : rdDocent.IsChecked is true ? "tutor": "Not Set",
+                                            Password = txtPassword.Text.Equals(string.Empty)
+                                                ? Create
+                                                    ? "Not Set"
+                                                    : User.UserData.Password
+                                                : txtPassword.Text
                                         }, 
                                         MetaData = Data
                                     }; 
@@ -60,34 +64,35 @@ namespace InputWindow
         {
             InitializeComponent();
 
+            User = user;
             Create = false;
             Data = new MetaData 
             { 
                 Methode = CRUDMethode.UPDATE, 
                 Origin = "AD", 
                 TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), 
-                GUID = user.MetaData.GUID, 
-                Version = user.MetaData.Version + 1
+                GUID = User.MetaData.GUID, 
+                Version = User.MetaData.Version + 1
             };
 
             rdDocent.IsChecked = rdStudent.IsChecked = false;
 
-            txtFirstName.Text = user.UserData.FirstName;
-            txtLastName.Text = user.UserData.LastName;
+            txtFirstName.Text = User.UserData.FirstName;
+            txtLastName.Text = User.UserData.LastName;
 
-            txtEmail.Text = (user.UserData.Email.Length != 0)? user.UserData.Email: 
-                (user.UserData.LastName.Length != 0)
-                ? $"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant()}@desideriushogeschool.be"
-                : $"{user.UserData.FirstName.ToLowerInvariant()}@desideriushogeschool.be";
+            txtEmail.Text = (User.UserData.Email.Length != 0)? User.UserData.Email: 
+                (User.UserData.LastName.Length != 0)
+                ? $"{User.UserData.FirstName.ToLowerInvariant()}.{User.UserData.LastName.ToLowerInvariant()}@desideriushogeschool.be"
+                : $"{User.UserData.FirstName.ToLowerInvariant()}@desideriushogeschool.be";
             txtEmail.IsReadOnly = true;
 
-            txtBirthday.SelectedDate = (user.UserData.BirthDay != "Not Set") 
-                ? DateTime.Parse(user.UserData.BirthDay)
+            txtBirthday.SelectedDate = (User.UserData.BirthDay != "Not Set") 
+                ? DateTime.Parse(User.UserData.BirthDay)
                 : DateTime.Parse("1/1/2000");
 
-            txtStudy.Text = user.UserData.Study;
-            if (user.UserData.Role == "student") { rdStudent.IsChecked = true; } else { rdDocent.IsChecked = true; }
-            txtPassword.Text = user.UserData.Password;
+            txtStudy.Text = User.UserData.Study;
+            if (User.UserData.Role == "student") { rdStudent.IsChecked = true; } else { rdDocent.IsChecked = true; }
+            txtPassword.Text = User.UserData.Password;
 
             btnConfirm.Content = "Update";
         }
