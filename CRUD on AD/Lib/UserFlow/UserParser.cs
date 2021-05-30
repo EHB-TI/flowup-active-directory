@@ -117,7 +117,7 @@ namespace Lib
                 SAMAccountName = (string)entry.Properties["sAMAccountName"].Value,
                 Study = ((string)entry.Properties["study"].Value is null) ? "Not Set" : (string)entry.Properties["study"].Value,
                 BirthDay = ((string)entry.Properties["birthday"].Value is null) ? "Not Set" : (string)entry.Properties["birthday"].Value,
-                ObjectVersion = (int?)entry.Properties["objectVersion"].Value is null? -1 : (int)entry.Properties["objectVersion"].Value, //Needs to Change, check for NullPointer
+                ObjectVersion = (int?)entry.Properties["objectVersion"].Value is null? 1 : (int)entry.Properties["objectVersion"].Value, //Needs to Change, check for NullPointer
                 ObjectGUID = new Guid((byte[])entry.Properties["objectGUID"].Value).ToString()
             };
     }
