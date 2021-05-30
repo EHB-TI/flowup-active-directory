@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Lib.UserFlow;
 using Lib.UUIDFlow;
 using Lib.XMLFlow;
 
@@ -183,13 +184,27 @@ namespace Lib
             //if (!ValidateXML(xml))   
             //{
             //    Debug.WriteLine("Ongeldige XML!!!");
+
+                var serializer = new XmlSerializer(typeof(ExtraUser));
+                var reader = new StringReader(xml);
+                var user = (ExtraUser)serializer.Deserialize(reader);
+                return user;
+ 
+        }
+        public static UUIDUser XMLToUUIDObject(string xml)
+        {
+            //if (!ValidateXML(xml))   
+            //{
+            //    Debug.WriteLine("Ongeldige XML!!!");
             //}
 
-            var serializer = new XmlSerializer(typeof(ExtraUser));
-            var reader = new StringReader(xml);
-            var user = (ExtraUser)serializer.Deserialize(reader);
 
-            return user;
+ 
+                var serializer = new XmlSerializer(typeof(UUIDUser));
+                var reader = new StringReader(xml);
+                var user = (UUIDUser)serializer.Deserialize(reader);
+                return user;
+            
         }
         public static bool ValidateXML(string xml)
         {

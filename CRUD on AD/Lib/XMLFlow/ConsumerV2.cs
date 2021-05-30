@@ -78,31 +78,66 @@ namespace Lib.XMLFlow
                         }
                         else if (XMLParser.ReadXMLTag(message, "origin") == "UUID")
                         {
-                            var user = XMLParser.XMLToExtraObject(message);
-                            user.MetaData.Origin = "AD";
-                            user.MetaData.TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K");
+                            if (XMLParser.ReadXMLTag(message, "method") == "CREATE")
+                            {
+                                var user = XMLParser.XMLToExtraObject(message);
 
-                            //<?xml version="1.0" encoding="utf-8"?>
-                            string xmlmessage = "<user><header>" +
-                            "<UUID>"+user.MetaData.UUIDMaster+"</UUID>" +
-                            "<method>" + user.MetaData.Methode + "</method>" +
-                            "<origin>"+ user.MetaData.Origin + "</origin>" +
-                            "<version>"+ user.MetaData.Version+"</version>"+
-                            "<sourceEntityId></sourceEntityId>" +
-                            "<timestamp>" + user.MetaData.TimeStamp + "</timestamp>" +
-                            "</header>" +
-                            "<body>" +
-                            "<firstname>" + user.UserData.FirstName + "</firstname>" +
-                            "<lastname>" + user.UserData.LastName + "</lastname>" +
-                            "<email>" + user.UserData.Email + "</email>" +
-                            "<birthday>" + user.UserData.BirthDay + "</birthday>" +
-                            "<role>" + user.UserData.Role + "</role>" +
-                            "<study>" + user.UserData.Study + "</study>" +
-                            "</body></user>";
+                                user.MetaData.Origin = "AD";
+                                user.MetaData.TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K");
+
+                                //<?xml version="1.0" encoding="utf-8"?>
+                                string xmlmessage = "<user><header>" +
+                                "<UUID>" + user.MetaData.UUIDMaster + "</UUID>" +
+                                "<method>" + user.MetaData.Methode + "</method>" +
+                                "<origin>" + user.MetaData.Origin + "</origin>" +
+                                "<version>" + user.MetaData.Version + "</version>" +
+                                "<sourceEntityId></sourceEntityId>" +
+                                "<timestamp>" + user.MetaData.TimeStamp + "</timestamp>" +
+                                "</header>" +
+                                "<body>" +
+                                "<firstname>" + user.UserData.FirstName + "</firstname>" +
+                                "<lastname>" + user.UserData.LastName + "</lastname>" +
+                                "<email>" + user.UserData.Email + "</email>" +
+                                "<birthday>" + user.UserData.BirthDay + "</birthday>" +
+                                "<role>" + user.UserData.Role + "</role>" +
+                                "<study>" + user.UserData.Study + "</study>" +
+                                "</body></user>";
 
 
 
-                            ProducerV2.send(xmlmessage, Severity.user.ToString());
+                                ProducerV2.send(xmlmessage, Severity.user.ToString());
+                            }
+                            else
+                            {
+                                var user = XMLParser.XMLToUUIDObject(message);
+
+                                user.MetaData.Origin = "AD";
+                                user.MetaData.TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K");
+
+                                //<?xml version="1.0" encoding="utf-8"?>
+                                string xmlmessage = "<user><header>" +
+                                "<UUID>" + user.MetaData.UUIDMaster + "</UUID>" +
+                                "<method>" + user.MetaData.Methode + "</method>" +
+                                "<origin>" + user.MetaData.Origin + "</origin>" +
+                                "<version></version>" +
+                                "<sourceEntityId></sourceEntityId>" +
+                                "<timestamp>" + user.MetaData.TimeStamp + "</timestamp>" +
+                                "</header>" +
+                                "<body>" +
+                                "<firstname>" + user.UserData.FirstName + "</firstname>" +
+                                "<lastname>" + user.UserData.LastName + "</lastname>" +
+                                "<email>" + user.UserData.Email + "</email>" +
+                                "<birthday>" + user.UserData.BirthDay + "</birthday>" +
+                                "<role>" + user.UserData.Role + "</role>" +
+                                "<study>" + user.UserData.Study + "</study>" +
+                                "</body></user>";
+
+
+
+                                ProducerV2.send(xmlmessage, Severity.user.ToString());
+                            }
+                            
+                            
                         }
                     }
                     else
@@ -142,6 +177,11 @@ namespace Lib.XMLFlow
                 Console.ReadLine();
             }
 
+        }
+        private void sendToUserQUEUE<T>(T user)
+        {
+            
+            
         }
         private static string createUserXml(XDocument xml)
         {
