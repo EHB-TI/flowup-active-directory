@@ -82,8 +82,8 @@ namespace InputWindow
 
             txtEmail.Text = (User.UserData.Email.Length != 0)? User.UserData.Email: 
                 (User.UserData.LastName.Length != 0)
-                ? $"{User.UserData.FirstName.ToLowerInvariant()}.{User.UserData.LastName.ToLowerInvariant()}@desideriushogeschool.be"
-                : $"{User.UserData.FirstName.ToLowerInvariant()}@desideriushogeschool.be";
+                ? $"{User.UserData.FirstName.ToLowerInvariant()}.{User.UserData.LastName.ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com"
+                : $"{User.UserData.FirstName.ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com";
             txtEmail.IsReadOnly = true;
 
             txtBirthday.SelectedDate = (User.UserData.BirthDay != "Not Set") 
@@ -149,22 +149,22 @@ namespace InputWindow
             {
                 if (txtFirstName.Text.Contains(" ") || txtLastName.Text.Contains(" "))
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}.{txtLastName.Text.Replace(" ", ".").ToLowerInvariant()}@desideriushogeschool.be";
+                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}.{txtLastName.Text.Replace(" ", ".").ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com";
                 }
                 else
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}.{txtLastName.Text.ToLowerInvariant()}@desideriushogeschool.be";
+                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}.{txtLastName.Text.ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com";
                 }
             } 
             else
             {
                 if (txtFirstName.Text.Contains(" "))
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}@desideriushogeschool.be";
+                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com";
                 }
                 else
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}@desideriushogeschool.be";
+                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com";
                 }
             }
         }
