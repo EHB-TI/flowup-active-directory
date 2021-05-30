@@ -44,16 +44,33 @@ namespace Lib
                 //Create User object
                 //Set:  Name, CN,
                 //Not Set:  SN, sAMAccountName, Email, Role, GivenName, DisplayName
+                Console.WriteLine("Password: "+adUser.UserPassword);
 
                 var entry = RootOU.Children.Add(adUser.CN, "user");
-                Debug.WriteLine("User Password: "+adUser.UserPassword);
                 entry.Properties["LockOutTime"].Value = 0; //unlock account
                 adUser.AssignADObjectAttributesToDirectoryEntry(entry);
-
                 entry.CommitChanges();
-                //Minimum 7 characters else Password Policy will interfere
 
-                entry.Invoke("SetPassword", new object[] { adUser.UserPassword }); //Handle Error
+                //Enable Account -- Cannot change account state from another machine
+                const int UF_ACCOUNTDISABLE = 0x0002;
+                const int UF_PASSWD_NOTREQD = 0x0020;
+                const int UF_PASSWD_CANT_CHANGE = 0x0040;
+                const int UF_NORMAL_ACCOUNT = 0x0200;
+                const int UF_DONT_EXPIRE_PASSWD = 0x10000;
+                const int UF_PASSWORD_EXPIRED = 0x800000;
+
+                //Minimum 7 characters; and not the same password; else Password Policy will interfere
+                try
+                {
+                    entry.Invoke("SetPassword", new object[] { adUser.UserPassword }); //Handle Error
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Password: " + adUser.UserPassword);
+                    entry.Invoke("SetPassword", new object[] { "Student1" });
+                }
+                
+                entry.Properties["userAccountControl"].Value = (UF_NORMAL_ACCOUNT); // (UF_NORMAL_ACCOUNT | UF_ACCOUNTDISABLE) == 0x0202
 
                 entry.CommitChanges();
                 Debug.WriteLine("User Creation Succeeded!");
@@ -91,6 +108,7 @@ namespace Lib
                 var objUser = SetupSearcher($"(&(objectCategory=Person)(CN={oldUser.CN}))", true).FindOne().GetDirectoryEntry();
 
                 objUser.Rename(newUser.CN);
+                objUser.Invoke("SetPassword", new object[] { newUser.UserPassword }); //Handle Error
                 newUser.AssignADObjectAttributesToDirectoryEntry(objUser);
 
                 objUser.UsePropertyCache = true;

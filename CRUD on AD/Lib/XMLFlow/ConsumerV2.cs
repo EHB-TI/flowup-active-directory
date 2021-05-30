@@ -42,23 +42,33 @@ namespace Lib.XMLFlow
                     var message = Encoding.UTF8.GetString(body);
                     var routingKey = ea.RoutingKey;
 
+                    Console.WriteLine(" [x] Recieved '{0}':'{1}'", routingKey, message);
 
-                    //user xsd validation
                     XmlSchemaSet schema = new XmlSchemaSet();
                     schema.Add("", "Userxsd.xsd");
                     XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
+
+
                     bool xmlValidation = true;
 
-                    xml.Validate(schema, (sender, e) =>
+                    string origin = XMLParser.ReadXMLTag(message, "origin");
+
+                    if (origin != "AD")
                     {
-                        xmlValidation = false;
-                    });
+
+
+                        xml.Validate(schema, (sender, e) =>
+                        {
+                            xmlValidation = false;
+                        });
+                    }
+                    
 
 
 
                     if (xmlValidation) //Has to change
                     {
-                        Console.WriteLine("valid");
+                        Console.WriteLine("Consumer: valid");
 
 
                         //Get CRUD Operation and tranfser to functionality
@@ -71,17 +81,40 @@ namespace Lib.XMLFlow
                             var user = XMLParser.XMLToExtraObject(message);
                             user.MetaData.Origin = "AD";
                             user.MetaData.TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K");
-                            ProducerV2.send(XMLParser.ExtraObjectToXML(user), Severity.user.ToString());
+
+                            //<?xml version="1.0" encoding="utf-8"?>
+                            string xmlmessage = "<user><header>" +
+                            "<UUID>"+user.MetaData.UUIDMaster+"</UUID>" +
+                            "<method>" + user.MetaData.Methode + "</method>" +
+                            "<origin>"+ user.MetaData.Origin + "</origin>" +
+                            "<version>"+ user.MetaData.Version+"</version>"+
+                            "<sourceEntityId>" + user.MetaData.GUID + "</sourceEntityId>" +
+                            "<timestamp>" + user.MetaData.TimeStamp + "</timestamp>" +
+                            "</header>" +
+                            "<body>" +
+                            "<firstname>" + user.UserData.FirstName + "</firstname>" +
+                            "<lastname>" + user.UserData.LastName + "</lastname>" +
+                            "<email>" + user.UserData.Email + "</email>" +
+                            "<birthday>" + user.UserData.BirthDay + "</birthday>" +
+                            "<role>" + user.UserData.Role + "</role>" +
+                            "<study>" + user.UserData.Study + "</study>" +
+                            "</body></user>";
+
+
+
+                            ProducerV2.send(xmlmessage, Severity.user.ToString());
                         }
                     }
                     else
                     {
+                        Console.WriteLine("Consumer: not valid");
                         //xsd validation error
                         schema = new XmlSchemaSet();
                         schema.Add("", "Errorxsd.xsd");
                         xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
                         xmlValidation = true;
 
+                        
                         xml.Validate(schema, (sender, e) =>
                         {
                             xmlValidation = false;

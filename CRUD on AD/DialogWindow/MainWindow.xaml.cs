@@ -77,8 +77,8 @@ namespace InputWindow
 
             txtEmail.Text = (user.UserData.Email.Length != 0)? user.UserData.Email: 
                 (user.UserData.LastName.Length != 0)
-                ? $"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant()}@student.dhs.be"
-                : $"{user.UserData.FirstName.ToLowerInvariant()}@student.dhs.be";
+                ? $"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant()}@desideriushogeschool.be"
+                : $"{user.UserData.FirstName.ToLowerInvariant()}@desideriushogeschool.be";
             txtEmail.IsReadOnly = true;
 
             txtBirthday.SelectedDate = (user.UserData.BirthDay != "Not Set") 
@@ -114,14 +114,20 @@ namespace InputWindow
             }
             else
             {
-
-                if (!txtFirstName.Text.Equals(string.Empty))
+                if (txtPassword.Text.Equals(string.Empty) || (txtPassword.Text.Count(char.IsDigit) >= 1 && txtPassword.Text.Length >= 7))
                 {
-                    this.DialogResult = true;
+                    if (!txtFirstName.Text.Equals(string.Empty))
+                    {
+                        this.DialogResult = true;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Firstname is REQUIRED!");
+                    }
                 }
-                else
+                else if (txtPassword.Text.Count(char.IsDigit) < 1 || txtPassword.Text.Length < 7)
                 {
-                    MessageBox.Show("Firstname is REQUIRED!");
+                    MessageBox.Show("Password needs to be 7 character long; with atleast 1 number!");
                 }
             }
             
@@ -136,11 +142,25 @@ namespace InputWindow
         {
             if (txtLastName.Text.Length != 0 )
             {
-                txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}.{txtLastName.Text.ToLowerInvariant()}@student.dhs.be";
+                if (txtFirstName.Text.Contains(" ") || txtLastName.Text.Contains(" "))
+                {
+                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}.{txtLastName.Text.Replace(" ", ".").ToLowerInvariant()}@desideriushogeschool.be";
+                }
+                else
+                {
+                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}.{txtLastName.Text.ToLowerInvariant()}@desideriushogeschool.be";
+                }
             } 
             else
             {
-                txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}@student.dhs.be";
+                if (txtFirstName.Text.Contains(" "))
+                {
+                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}@desideriushogeschool.be";
+                }
+                else
+                {
+                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}@desideriushogeschool.be";
+                }
             }
         }
     }

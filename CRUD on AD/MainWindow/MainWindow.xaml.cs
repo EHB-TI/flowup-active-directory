@@ -21,7 +21,7 @@ namespace MainWindow
             InitializeComponent();
 
             Program = new CRUD();
-            Program.Binding(Connection.LOCAL);
+            Program.Binding(Connection.OUTSIDE);
             lblCurrent.Content = "Current Connection: LOCAL";      //LOCAL or LDAP
             btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = btnChangeConnection.IsEnabled = false;
         }
@@ -117,7 +117,7 @@ namespace MainWindow
                 Debug.WriteLine(fieldResults.SelectedValue.ToString());
 
                 var user = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToIntraUserObject();
-                user.MetaData = new MetaData { GUID = user.MetaData.GUID, Methode = CRUDMethode.DELETE, Origin = "AD", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") };
+                user.MetaData = new MetaData { GUID = user.MetaData.GUID, Methode = CRUDMethode.DELETE, Origin = "AD", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), Version = user.MetaData.Version };
 
                 if (ProducerV2.send(XMLParser.IntraObjectToXML(user), Severity.AD.ToString()))
                 {
