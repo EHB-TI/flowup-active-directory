@@ -63,8 +63,28 @@ namespace Lib
                     Origin = "AD",
                     TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K")
                 };
-                
-                Uuid.Update(ExtraObjectToXML(outUser));
+                //outUser.UserData.
+                string message = "<user><header>" +
+                    "<UUID></UUID>" +
+                    "<method>"+outUser.MetaData.Methode+"</method>" +
+                    "<origin>"+outUser.MetaData.Origin+"</origin>" +
+                    "<version></version>" +
+                    "<sourceEntityId>"+outUser.MetaData.GUID+"</sourceEntityId>" +
+                    "<timestamp>"+outUser.MetaData.TimeStamp+"</timestamp>" +
+                    "</header>" +
+                    "<body>" +
+                    "<firstname>"+outUser.UserData.FirstName+"</firstname>" +
+                    "<lastname>"+ outUser.UserData.LastName + "</lastname>" +
+                    "<email>"+ outUser.UserData.Email+"</email>" +
+                    "<birthday>"+ outUser.UserData.BirthDay +"</birthday>" +
+                    "<role>"+ outUser.UserData.Role +"</role>" +
+                    "<study>"+ outUser.UserData.Study +"</study>" +
+                    "</body></user>";
+
+                Console.WriteLine("Sending to UUID");
+                //Uuid.Update(ExtraObjectToXML(outUser));
+                Uuid.Update(message);
+
                 /*
                  <?xml version="1.0" encoding="utf-16"?>
                     <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -104,13 +124,25 @@ namespace Lib
         }
         public static string ReadXMLTag(string xml, string tag)
         {
-            var schema = new XmlSchemaSet();
-            var xmlDoc = XDocument.Parse(xml);
-            var row = xmlDoc.Descendants().Where(x => x.Name.LocalName == "user").First();
-            var operation = GetSubElementValue(row, tag);
-            Console.WriteLine(operation);
+            string operation = "";
+            try
+            {
+                //Console.WriteLine("xml: " + xml);
+                //Console.WriteLine("tag: " + tag);
+                var schema = new XmlSchemaSet();
+                var xmlDoc = XDocument.Parse(xml);
+                var row = xmlDoc.Descendants().Where(x => x.Name.LocalName == "user").First();
+                operation = (string)GetSubElementValue(row, tag);
+                Console.WriteLine(operation);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(ReadXMLTag(xml, "error"));
+            }
+            
 
-            return (string)operation;
+            return operation;
         }
 
         public static object GetSubElementValue(XElement container, string subElementName)

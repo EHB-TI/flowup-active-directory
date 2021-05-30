@@ -91,6 +91,7 @@ namespace Lib
                 var objUser = SetupSearcher($"(&(objectCategory=Person)(CN={oldUser.CN}))", true).FindOne().GetDirectoryEntry();
 
                 objUser.Rename(newUser.CN);
+                objUser.Invoke("SetPassword", new object[] { newUser.UserPassword }); //Handle Error
                 newUser.AssignADObjectAttributesToDirectoryEntry(objUser);
 
                 objUser.UsePropertyCache = true;

@@ -34,16 +34,21 @@ namespace Lib.XMLFlow
 
                 bool xmlValidation = true;
 
-                xml.Validate(schema, (sender, e) =>
+                string origin = XMLParser.ReadXMLTag(message, "origin");
+
+                if (origin != "AD")
                 {
-                    xmlValidation = false;
-                });
 
 
+                    xml.Validate(schema, (sender, e) =>
+                    {
+                        xmlValidation = false;
+                    });
+                }
 
                 if (xmlValidation) //Change to XMLValidation
                 {
-                    Console.WriteLine("valid");
+                    Console.WriteLine("Producer: valid");
 
 
 
@@ -63,7 +68,7 @@ namespace Lib.XMLFlow
                 }
                 else
                 {
-                    Console.WriteLine("not valid");
+                    Console.WriteLine("Producer: not valid");
                 }
 
 

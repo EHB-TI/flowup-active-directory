@@ -114,14 +114,20 @@ namespace InputWindow
             }
             else
             {
-
-                if (!txtFirstName.Text.Equals(string.Empty))
+                if (txtPassword.Text.Equals(string.Empty) || (txtPassword.Text.Count(char.IsDigit) >= 1 && txtPassword.Text.Length >= 7))
                 {
-                    this.DialogResult = true;
+                    if (!txtFirstName.Text.Equals(string.Empty))
+                    {
+                        this.DialogResult = true;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Firstname is REQUIRED!");
+                    }
                 }
-                else
+                else if (txtPassword.Text.Count(char.IsDigit) < 1 || txtPassword.Text.Length < 7)
                 {
-                    MessageBox.Show("Firstname is REQUIRED!");
+                    MessageBox.Show("Password needs to be 7 character long; with atleast 1 number!");
                 }
             }
             
@@ -136,11 +142,25 @@ namespace InputWindow
         {
             if (txtLastName.Text.Length != 0 )
             {
-                txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}.{txtLastName.Text.ToLowerInvariant()}@student.dhs.be";
+                if (txtFirstName.Text.Contains(" ") || txtLastName.Text.Contains(" "))
+                {
+                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}.{txtLastName.Text.Replace(" ", ".").ToLowerInvariant()}@student.dhs.be";
+                }
+                else
+                {
+                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}.{txtLastName.Text.ToLowerInvariant()}@student.dhs.be";
+                }
             } 
             else
             {
-                txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}@student.dhs.be";
+                if (txtFirstName.Text.Contains(" "))
+                {
+                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}@student.dhs.be";
+                }
+                else
+                {
+                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}@student.dhs.be";
+                }
             }
         }
     }
