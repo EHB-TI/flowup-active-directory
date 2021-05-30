@@ -77,8 +77,8 @@ namespace InputWindow
 
             txtEmail.Text = (user.UserData.Email.Length != 0)? user.UserData.Email: 
                 (user.UserData.LastName.Length != 0)
-                ? $"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant()}@student.dhs.be"
-                : $"{user.UserData.FirstName.ToLowerInvariant()}@student.dhs.be";
+                ? $"{user.UserData.FirstName.ToLowerInvariant()}.{user.UserData.LastName.ToLowerInvariant()}@desideriushogeschool.be"
+                : $"{user.UserData.FirstName.ToLowerInvariant()}@desideriushogeschool.be";
             txtEmail.IsReadOnly = true;
 
             txtBirthday.SelectedDate = (user.UserData.BirthDay != "Not Set") 
@@ -144,22 +144,22 @@ namespace InputWindow
             {
                 if (txtFirstName.Text.Contains(" ") || txtLastName.Text.Contains(" "))
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}.{txtLastName.Text.Replace(" ", ".").ToLowerInvariant()}@student.dhs.be";
+                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}.{txtLastName.Text.Replace(" ", ".").ToLowerInvariant()}@desideriushogeschool.be";
                 }
                 else
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}.{txtLastName.Text.ToLowerInvariant()}@student.dhs.be";
+                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}.{txtLastName.Text.ToLowerInvariant()}@desideriushogeschool.be";
                 }
             } 
             else
             {
                 if (txtFirstName.Text.Contains(" "))
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}@student.dhs.be";
+                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}@desideriushogeschool.be";
                 }
                 else
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}@student.dhs.be";
+                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}@desideriushogeschool.be";
                 }
             }
         }
