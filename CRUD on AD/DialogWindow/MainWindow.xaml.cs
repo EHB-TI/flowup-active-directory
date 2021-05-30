@@ -82,8 +82,8 @@ namespace InputWindow
 
             txtEmail.Text = (User.UserData.Email.Length != 0)? User.UserData.Email: 
                 (User.UserData.LastName.Length != 0)
-                ? $"{User.UserData.FirstName.ToLowerInvariant()}.{User.UserData.LastName.ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com"
-                : $"{User.UserData.FirstName.ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com";
+                ? $"{User.UserData.FirstName.ToLowerInvariant()}.{User.UserData.LastName.ToLowerInvariant()}@desideriushogeschool.be"
+                : $"{User.UserData.FirstName.ToLowerInvariant()}@desideriushogeschool.be";
             txtEmail.IsReadOnly = true;
 
             txtBirthday.SelectedDate = (User.UserData.BirthDay != "Not Set") 
@@ -103,13 +103,17 @@ namespace InputWindow
             {
                 if (!txtFirstName.Text.Equals(string.Empty) && !txtPassword.Text.Equals(string.Empty))
                 {
-                    if (txtPassword.Text.Count(char.IsDigit) >= 1 && txtPassword.Text.Length >= 7)
+                    if (txtPassword.Text.Count(char.IsDigit) >= 1 && txtPassword.Text.Length >= 7 && (txtFirstName.Text.Count(char.IsDigit) == 0 && txtLastName.Text.Count(char.IsDigit) == 0))
                     {
                         this.DialogResult = true;
                     }
-                    else
+                    else if (txtPassword.Text.Count(char.IsDigit) >= 1 && txtPassword.Text.Length >= 7)
                     {
                         MessageBox.Show("Password needs to be 7 character long; with atleast 1 number!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("No digits allowed in the First- and Lastname!");
                     }
                 }
                 else
@@ -123,7 +127,14 @@ namespace InputWindow
                 {
                     if (!txtFirstName.Text.Equals(string.Empty))
                     {
-                        this.DialogResult = true;
+                        if (txtFirstName.Text.Count(char.IsDigit) ==  0 && txtLastName.Text.Count(char.IsDigit) == 0)
+                        {
+                            this.DialogResult = true;
+                        }
+                        else
+                        {
+                            MessageBox.Show("No digits allowed in the First- and Lastname!");
+                        }
                     }
                     else
                     {
@@ -149,22 +160,22 @@ namespace InputWindow
             {
                 if (txtFirstName.Text.Contains(" ") || txtLastName.Text.Contains(" "))
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}.{txtLastName.Text.Replace(" ", ".").ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com";
+                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}.{txtLastName.Text.Replace(" ", ".").ToLowerInvariant()}@desideriushogeschool.be";
                 }
                 else
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}.{txtLastName.Text.ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com";
+                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}.{txtLastName.Text.ToLowerInvariant()}@desideriushogeschool.be";
                 }
             } 
             else
             {
                 if (txtFirstName.Text.Contains(" "))
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com";
+                    txtEmail.Text = $"{txtFirstName.Text.Replace(" ", ".").ToLowerInvariant()}@desideriushogeschool.be";
                 }
                 else
                 {
-                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}@flowupdesiderius.onmicrosoft.com";
+                    txtEmail.Text = $"{txtFirstName.Text.ToLowerInvariant()}@desideriushogeschool.be";
                 }
             }
         }
