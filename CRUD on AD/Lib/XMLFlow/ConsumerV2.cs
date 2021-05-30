@@ -88,7 +88,6 @@ namespace Lib.XMLFlow
                             "<method>" + user.MetaData.Methode + "</method>" +
                             "<origin>"+ user.MetaData.Origin + "</origin>" +
                             "<version>"+ user.MetaData.Version+"</version>"+
-                            "<sourceEntityId>" + user.MetaData.GUID + "</sourceEntityId>" +
                             "<timestamp>" + user.MetaData.TimeStamp + "</timestamp>" +
                             "</header>" +
                             "<body>" +
