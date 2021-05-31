@@ -34,15 +34,16 @@ namespace MainWindow
             fieldResults.Items.Clear();
             try
             {
-                List<ADUser> l = Program.GetADUsers();
-                if (l != null)
-                {
-                    l.ForEach(x => fieldResults.Items.Add($"CN={x.CN}"));
-                }
-                else
-                {
-                    MessageBox.Show("No User found or Database not connected!");
-                }
+                ProducerV2.send("<methode>READ</methode><origin>AD</origin>", Severity.AD.ToString());
+                //List<ADUser> l = null;
+                //if (l != null)
+                //{
+                //    l.ForEach(x => fieldResults.Items.Add($"CN={x.CN}"));
+                //}
+                //else
+                //{
+                //    MessageBox.Show("No User found or Database not connected!");
+                //}
             }
             catch (Exception ex)
             {

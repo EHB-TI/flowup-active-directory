@@ -99,6 +99,7 @@
     <Compile Include="UserFlow\ADUser.cs" />
     <Compile Include="CRUDFlow\Connection.cs" />
     <Compile Include="UserFlow\ExtraUser.cs" />
+    <Compile Include="UserFlow\ListUsers.cs" />
     <Compile Include="UserFlow\Severity.cs" />
     <Compile Include="UserFlow\UUIDUser.cs" />
     <Compile Include="UUIDFlow\Uuid.cs" />

@@ -19,17 +19,20 @@ namespace Lib
         public static void OperationToCRUD(this string operation, IntraUser user, CRUD crudInstance) 
         {
             Debug.WriteLine("OperationTOcrud");
-            bool succes;
             var adUser = user.IntraUserObjectToADObject();
             switch (operation.ToUpperInvariant())
             {
                 case "CREATE":
-                    succes = crudInstance.CreateUser(user.IntraUserObjectToADObject());
-                    if (crudInstance.IsUserInAD(adUser.CN))
+                    if (crudInstance.CreateUser(user.IntraUserObjectToADObject()))
                     {
-                        Debug.WriteLine("Searching for GUID");
-                        user.MetaData.GUID = crudInstance.FindADUser(adUser.CN).ObjectGUID;
-                        Debug.WriteLine("GUID: "+user.MetaData.GUID);
+                        if (crudInstance.IsUserInAD(adUser.CN))
+                        {
+                            Debug.WriteLine("Searching for GUID");
+                            user.MetaData.GUID = crudInstance.FindADUser(adUser.CN).ObjectGUID;
+                            Debug.WriteLine("GUID: " + user.MetaData.GUID);
+
+                            Uuid.Update(user);
+                        }
                     }
                     else
                     {
@@ -37,7 +40,10 @@ namespace Lib
                     }
                     break;
                 case "DELETE":
-                    succes = crudInstance.DeleteUser(adUser.CN);
+                    if (crudInstance.DeleteUser(adUser.CN))
+                    {
+                        Uuid.Update(user);
+                    }
                     break;
                 case "UPDATE":
                     Debug.WriteLine("Searching for old user with GUID: "+ user.MetaData.GUID);
@@ -47,13 +53,14 @@ namespace Lib
                         Uuid.Update(user);
                     }
                     break;
-                //case "READ":
-                //    break;
+                case "READ":
+                    ListUsers.List = crudInstance.GetADUsers();
+                    Console.WriteLine(ObjectToXML(ListUsers.List));
+                    break;
                 //case "NOT SET":
                 //    break;
                 default:
                     Console.WriteLine(operation);
-                    succes = false;
                     break;
             }
         }
