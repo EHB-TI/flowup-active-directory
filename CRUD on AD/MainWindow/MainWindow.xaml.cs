@@ -35,11 +35,11 @@ namespace MainWindow
             try
             {
                 string xmlmessage = "<user><header>" +
-                                "<UUID></UUID>" +
+                                "<UUID>Not Set</UUID>" +
                                 "<method>READ</method>" +
                                 "<origin>AD</origin>" +
-                                "<version></version>" +
-                                "<sourceEntityId></sourceEntityId>" +
+                                "<version>0</version>" +
+                                "<sourceEntityId>Not Set</sourceEntityId>" +
                                 "<timestamp>"+DateTime.Now.ToString()+"</timestamp>" +
                                 "</header>" +
                                 "<body>" +

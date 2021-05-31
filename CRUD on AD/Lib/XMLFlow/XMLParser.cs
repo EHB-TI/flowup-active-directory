@@ -55,7 +55,7 @@ namespace Lib
                     break;
                 case "READ":
                     ListUsers.List = crudInstance.GetADUsers();
-                    Console.WriteLine(ObjectToXML(ListUsers.List));
+                    ProducerV2.send(ObjectToXML(ListUsers.List), Severity.GUI.ToString());
                     break;
                 //case "NOT SET":
                 //    break;
