@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 
 namespace Lib
 {
-    [XmlRoot("user")]
+     
     public class ADUser
     {
         [XmlElement("cn")]

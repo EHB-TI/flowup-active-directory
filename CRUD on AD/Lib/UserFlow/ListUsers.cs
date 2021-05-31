@@ -7,9 +7,9 @@ using System.Xml.Serialization;
 
 namespace Lib.UserFlow
 {
-    static class ListUsers
+    public static class ListUsers
     {
-        [XmlElement("users")]
+        [XmlArray("users")]
         public static List<ADUser> List { get; set; }
     }
 }

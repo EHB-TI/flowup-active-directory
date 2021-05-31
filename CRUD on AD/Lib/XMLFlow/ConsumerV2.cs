@@ -55,7 +55,7 @@ namespace Lib.XMLFlow
                     bool xmlValidation = true;
 
                     string origin = XMLParser.ReadXMLTag(message, "origin");
-
+                    
                     if (origin != "AD")
                     {
 
@@ -73,11 +73,10 @@ namespace Lib.XMLFlow
                     {
                         Console.WriteLine("Consumer: valid");
 
-
                         //Get CRUD Operation and tranfser to functionality
                         if (XMLParser.ReadXMLTag(message, "origin") == "AD")
                         {
-                            XMLParser.ReadXMLTag(message, "method").OperationToCRUD(XMLParser.XMLToIntraObject(message), CRUD);
+                            XMLParser.ReadXMLTag(message, "method").OperationToCRUD(XMLParser.XMLToObject<IntraUser>(message), CRUD);
                         }
                         else if (XMLParser.ReadXMLTag(message, "origin") == "UUID")
                         {

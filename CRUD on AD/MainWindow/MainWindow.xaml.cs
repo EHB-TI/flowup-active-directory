@@ -34,7 +34,25 @@ namespace MainWindow
             fieldResults.Items.Clear();
             try
             {
-                ProducerV2.send("<methode>READ</methode><origin>AD</origin>", Severity.AD.ToString());
+                string xmlmessage = "<user><header>" +
+                                "<UUID></UUID>" +
+                                "<method>READ</method>" +
+                                "<origin>AD</origin>" +
+                                "<version></version>" +
+                                "<sourceEntityId></sourceEntityId>" +
+                                "<timestamp>"+DateTime.Now.ToString()+"</timestamp>" +
+                                "</header>" +
+                                "<body>" +
+                                "<firstname>Not Set</firstname>" +
+                                "<lastname>Not Set</lastname>" +
+                                "<email>Not Set</email>" +
+                                "<birthday>Not Set</birthday>" +
+                                "<role>Not Set</role>" +
+                                "<study>Not Set</study>" +
+                                "</body></user>";
+
+                //Console.WriteLine(XMLParser.ObjectToXML(Program.GetADUsers()));
+                ProducerV2.send(xmlmessage, Severity.AD.ToString());
                 //List<ADUser> l = null;
                 //if (l != null)
                 //{
