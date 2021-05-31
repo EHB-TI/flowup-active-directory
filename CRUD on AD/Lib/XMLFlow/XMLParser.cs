@@ -54,11 +54,11 @@ namespace Lib
                     }
                     break;
                 case "READ":
+                    Debug.WriteLine("Get Users from READ operation");
                     ListUsers.List = crudInstance.GetADUsers();
-                    ProducerV2.send(ObjectToXML(ListUsers.List), Severity.GUI.ToString());
+                    Console.WriteLine(ObjectToXML(ListUsers.List));
+                    ProducerV2.send(ObjectToXML(ListUsers.List), Severity.GUI.ToString()); //Make new Producer
                     break;
-                //case "NOT SET":
-                //    break;
                 default:
                     Console.WriteLine(operation);
                     break;

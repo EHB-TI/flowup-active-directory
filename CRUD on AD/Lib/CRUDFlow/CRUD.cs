@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Lib
 {

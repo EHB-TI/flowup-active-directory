@@ -6,6 +6,10 @@ using InputWindow;
 using System.Diagnostics;
 using Lib.XMLFlow;
 using Lib.UserFlow;
+using System.Xml.Linq;
+using RabbitMQ.Client.Events;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace MainWindow
 {
@@ -15,13 +19,65 @@ namespace MainWindow
     public partial class DemoWindow : Window
     {
         public CRUD Program { get; set; }
-
+        
 
         public DemoWindow()
         {
             InitializeComponent();
 
+            //testdata
+            string message = "<ArrayOfADUser>"+
+                            "<ADUser>"+
+                            "<cn>testusertest</cn>"+
+                            "<displayName>testusertest</displayName>"+
+                            "<name>testusertest</name>"+
+                            "<givenName>testuser</givenName>"+
+                            "<userPrincipalName>testuser@desideriushogeschool.be</userPrincipalName>"+
+                            "<sn>test</sn>" +
+                            "<sAMAccountName>testuser</sAMAccountName>"+
+                            "<objectGuid>f3c45679-df6d-4621-8dc7-54e9c39c94ca</objectGuid>"+
+                            "<birthday>NotSet</birthday>"+
+                            "<objectVersion>-1</objectVersion>"+
+                            "<study>NotSet</study>"+
+                            "</ADUser>"+
+                            "<ADUser>" +
+                            "<cn>testusertest</cn>" +
+                            "<displayName>testusertest</displayName>" +
+                            "<name>testusertest</name>" +
+                            "<givenName>testuser</givenName>" +
+                            "<userPrincipalName>testuser@desideriushogeschool.be</userPrincipalName>" +
+                            "<sn>test</sn>" +
+                            "<sAMAccountName>testuser</sAMAccountName>" +
+                            "<objectGuid>f3c45679-df6d-4621-8dc7-54e9c39c94ca</objectGuid>" +
+                            "<birthday>NotSet</birthday>" +
+                            "<objectVersion>-1</objectVersion>" +
+                            "<study>NotSet</study>" +
+                            "</ADUser>" +
+                            "<ADUser>" +
+                            "<cn>testusertest</cn>" +
+                            "<displayName>testusertest</displayName>" +
+                            "<name>testusertest</name>" +
+                            "<givenName>testuser</givenName>" +
+                            "<userPrincipalName>testuser@desideriushogeschool.be</userPrincipalName>" +
+                            "<sn>test</sn>" +
+                            "<sAMAccountName>testuser</sAMAccountName>" +
+                            "<objectGuid>f3c45679-df6d-4621-8dc7-54e9c39c94ca</objectGuid>" +
+                            "<birthday>NotSet</birthday>" +
+                            "<objectVersion>-1</objectVersion>" +
+                            "<study>NotSet</study>" +
+                            "</ADUser>" +
+                            "</ArrayOfADUser>";
+            //getusers(message);
+            new Thread(() =>
+            {
+                EventingBasicConsumer test = ConsumerGUI.getMessage();
+                test.Received += (model, ea) =>
+                {
 
+                    getusers(ConsumerGUI.getMessag);
+                };
+            }).Start();
+            
 
             Program = new CRUD();
             Program.Binding(Connection.LOCAL);
@@ -34,7 +90,7 @@ namespace MainWindow
             fieldResults.Items.Clear();
             try
             {
-                string xmlmessage = "<user><header>" +
+                string xmlmessage = "<user><header>"+
                                 "<UUID>Not Set</UUID>" +
                                 "<method>READ</method>" +
                                 "<origin>AD</origin>" +
@@ -53,15 +109,21 @@ namespace MainWindow
 
                 //Console.WriteLine(XMLParser.ObjectToXML(Program.GetADUsers()));
                 ProducerV2.send(xmlmessage, Severity.AD.ToString());
+
+                
+
+                
+                
                 //List<ADUser> l = null;
-                //if (l != null)
-                //{
-                //    l.ForEach(x => fieldResults.Items.Add($"CN={x.CN}"));
-                //}
-                //else
-                //{
-                //    MessageBox.Show("No User found or Database not connected!");
-                //}
+                /*
+                if (l != null)
+                {
+                    l.ForEach(x => fieldResults.Items.Add($"CN={x.CN}"));
+                }
+                else
+                {
+                    MessageBox.Show("No User found or Database not connected!");
+                }*/
             }
             catch (Exception ex)
             {
@@ -220,5 +282,16 @@ namespace MainWindow
                 MessageBox.Show("Select a user first!");
             }
         }
+
+        public void getusers(string messange)
+        {
+            //XDocument xmlUser = XDocument.Parse(messange);
+            var test = XMLParser.XMLToObject<List<ADUser>>(messange);
+            foreach(var user in test)
+            {
+                fieldResults.Items.Add($"CN={user.CN}");
+            }
+        }
+
     }
 }

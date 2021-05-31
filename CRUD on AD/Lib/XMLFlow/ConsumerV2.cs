@@ -72,7 +72,7 @@ namespace Lib.XMLFlow
                     if (xmlValidation) //Has to change
                     {
                         Console.WriteLine("Consumer: valid");
-
+                       
                         //Get CRUD Operation and tranfser to functionality
                         if (XMLParser.ReadXMLTag(message, "origin") == "AD")
                         {
