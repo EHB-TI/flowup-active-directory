@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
+using System.Linq;
 
 namespace Lib
 {
@@ -41,11 +42,6 @@ namespace Lib
             //Check in AD and UUID for duplicates
             if (IsUserNotInAD(adUser.CN))   
             {
-                //Create User object
-                //Set:  Name, CN,
-                //Not Set:  SN, sAMAccountName, Email, Role, GivenName, DisplayName
-                Console.WriteLine("Password: "+adUser.UserPassword);
-
                 var entry = RootOU.Children.Add(adUser.CN, "user");
                 entry.Properties["LockOutTime"].Value = 0; //unlock account
                 adUser.AssignADObjectAttributesToDirectoryEntry(entry);
@@ -58,7 +54,6 @@ namespace Lib
                 const int UF_NORMAL_ACCOUNT = 0x0200;
                 const int UF_DONT_EXPIRE_PASSWD = 0x10000;
                 const int UF_PASSWORD_EXPIRED = 0x800000;
-
                 //Minimum 7 characters; and not the same password; else Password Policy will interfere
                 try
                 {
@@ -66,14 +61,14 @@ namespace Lib
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Password: " + adUser.UserPassword);
                     entry.Invoke("SetPassword", new object[] { "Student1" });
+                    Console.WriteLine("#######Password was rejected from the System######");
+                    Console.WriteLine($"#   Old Password = {adUser.UserPassword}");
+                    Console.WriteLine($"#   New Password = Student1");
+                    Console.WriteLine("##################################################");
                 }
-                
                 entry.Properties["userAccountControl"].Value = (UF_NORMAL_ACCOUNT); // (UF_NORMAL_ACCOUNT | UF_ACCOUNTDISABLE) == 0x0202
-
                 entry.CommitChanges();
-                Debug.WriteLine("User Creation Succeeded!");
                 
                 return true;
             }
@@ -108,7 +103,21 @@ namespace Lib
                 var objUser = SetupSearcher($"(&(objectCategory=Person)(CN={oldUser.CN}))", true).FindOne().GetDirectoryEntry();
 
                 objUser.Rename(newUser.CN);
-                objUser.Invoke("SetPassword", new object[] { newUser.UserPassword }); //Handle Error
+                if (!newUser.UserPassword.Equals(string.Empty))
+                {
+                    try
+                    {
+                        objUser.Invoke("SetPassword", new object[] { newUser.UserPassword });
+                    }
+                    catch (Exception)
+                    {
+                        objUser.Invoke("SetPassword", new object[] { "Student1" });
+                        Console.WriteLine("#######Password was rejected from the System######");
+                        Console.WriteLine($"#   Old Password = {newUser.UserPassword}");
+                        Console.WriteLine($"#   New Password = Student1");
+                        Console.WriteLine("##################################################");
+                    }
+                }
                 newUser.AssignADObjectAttributesToDirectoryEntry(objUser);
 
                 objUser.UsePropertyCache = true;

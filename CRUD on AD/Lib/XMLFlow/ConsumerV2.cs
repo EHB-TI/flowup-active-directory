@@ -13,7 +13,8 @@ namespace Lib.XMLFlow
     public class ConsumerV2
     {
         public static CRUD CRUD { get; set; }
-        
+        //public static LogWriter Logger { get; set; }    
+
         public static void getMessage()
         {
             CRUD = new CRUD();
@@ -33,6 +34,7 @@ namespace Lib.XMLFlow
                                   exchange: "direct_logs",
                                   routingKey: Severity.AD.ToString());
                 Console.WriteLine(" [*] Waiting for messages.");
+                //Logger.LogWrite("Waiting for messages on 'AD' Queue", typeof(ConsumerV2));
 
                 var consumer = new EventingBasicConsumer(channel);
                 consumer.Received += (model, ea) =>
@@ -43,6 +45,7 @@ namespace Lib.XMLFlow
                     var routingKey = ea.RoutingKey;
 
                     Console.WriteLine(" [x] Recieved '{0}':'{1}'", routingKey, message);
+                    //Logger.LogWrite($"Received message on '{routingKey}' Queue; With message = {message}", typeof(ConsumerV2));
 
                     XmlSchemaSet schema = new XmlSchemaSet();
                     schema.Add("", "Userxsd.xsd");
@@ -78,7 +81,7 @@ namespace Lib.XMLFlow
                         }
                         else if (XMLParser.ReadXMLTag(message, "origin") == "UUID")
                         {
-                            if (XMLParser.ReadXMLTag(message, "method") == "CREATE")
+                            if (XMLParser.ReadXMLTag(message, "method") != "DELETE")
                             {
                                 var user = XMLParser.XMLToExtraObject(message);
 

@@ -47,7 +47,6 @@ namespace Lib
                 {
                     GUID = user.MetaData.GUID,
                     Version = user.MetaData.Version,
-
                 }
             };
         }
@@ -120,5 +119,7 @@ namespace Lib
                 ObjectVersion = (int?)entry.Properties["objectVersion"].Value is null? -1 : (int)entry.Properties["objectVersion"].Value, //Needs to Change, check for NullPointer
                 ObjectGUID = new Guid((byte[])entry.Properties["objectGUID"].Value).ToString()
             };
+
+
     }
 }

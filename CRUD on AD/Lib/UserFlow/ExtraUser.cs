@@ -10,13 +10,11 @@ namespace Lib
         public MetaData MetaData { get; set; }
         [XmlElement("body")]
         public XUserData UserData { get; set; }
-
         public ExtraUser()
         {
             UserData = new XUserData { FirstName = "Not Set", LastName = "Not Set", Email = "Not Set", Role = "Not Set", BirthDay = "1/1/2021", Study = "Not Set" };
             MetaData = new MetaData { UUIDMaster = "Not Set", Methode = CRUDMethode.NOTSET, Origin = "Not Set", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), Version = -1 };
         }
-
         public override string ToString()
         {
             return $"Account Name: {UserData.FirstName} {UserData.LastName} - {UserData.Email} - {UserData.Role}";

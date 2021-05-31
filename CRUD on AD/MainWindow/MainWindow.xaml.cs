@@ -16,9 +16,12 @@ namespace MainWindow
     {
         public CRUD Program { get; set; }
 
+
         public DemoWindow()
         {
             InitializeComponent();
+
+
 
             Program = new CRUD();
             Program.Binding(Connection.LOCAL);
@@ -57,7 +60,7 @@ namespace MainWindow
                 try
                 {
                     var user = w.Answer;
-                    if (ProducerV2.send(XMLParser.IntraObjectToXML(user), Severity.AD.ToString()))
+                    if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
                     {
                         Console.WriteLine(XMLParser.IntraObjectToXML(user));
                         //XML Object Send over AD Queueu

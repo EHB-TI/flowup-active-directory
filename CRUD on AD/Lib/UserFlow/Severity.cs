@@ -8,6 +8,6 @@ namespace Lib.UserFlow
 {
     public enum Severity
     {
-        UUID, user, AD
+        UUID, user, AD, GUI
     }
 }

@@ -32,7 +32,7 @@ namespace InputWindow
                                             Password = txtPassword.Text.Equals(string.Empty)
                                                 ? Create
                                                     ? "Not Set"
-                                                    : User.UserData.Password
+                                                    : string.Empty
                                                 : txtPassword.Text
                                         }, 
                                         MetaData = Data
@@ -107,7 +107,7 @@ namespace InputWindow
                     {
                         this.DialogResult = true;
                     }
-                    else if (txtPassword.Text.Count(char.IsDigit) >= 1 && txtPassword.Text.Length >= 7)
+                    else if (txtPassword.Text.Count(char.IsDigit) >= 1 || txtPassword.Text.Length >= 7)
                     {
                         MessageBox.Show("Password needs to be 7 character long; with atleast 1 number!");
                     }

@@ -95,16 +95,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logging\LogWriter.cs" />
     <Compile Include="UserFlow\ADUser.cs" />
     <Compile Include="CRUDFlow\Connection.cs" />
     <Compile Include="UserFlow\ExtraUser.cs" />
     <Compile Include="UserFlow\Severity.cs" />
     <Compile Include="UserFlow\UUIDUser.cs" />
     <Compile Include="UUIDFlow\Uuid.cs" />
-    <Compile Include="XMLFlow\Consumer.cs" />
     <Compile Include="CRUDFlow\CRUD.cs" />
     <Compile Include="XMLFlow\ConsumerV2.cs" />
-    <Compile Include="XMLFlow\Producer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserFlow\IntraUser.cs" />
     <Compile Include="UserFlow\UserParser.cs" />
