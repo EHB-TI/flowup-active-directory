@@ -46,6 +46,7 @@ namespace Lib
                 var entry = RootOU.Children.Add(adUser.CN, "user");
                 entry.Properties["LockOutTime"].Value = 0; //unlock account
                 adUser.AssignADObjectAttributesToDirectoryEntry(entry);
+                AddUserToGroup(RootOU, entry, "licenseUsers");
                 entry.CommitChanges();
 
                 //Enable Account -- Cannot change account state from another machine
@@ -185,6 +186,43 @@ namespace Lib
                 throw new Exception("User exists in Active Directory!");
             }
             return true;
+        }
+        public static void AddUserToGroup(DirectoryEntry de, DirectoryEntry deUser, string GroupName)
+        {
+            DirectorySearcher deSearch = new DirectorySearcher();
+            deSearch.SearchRoot = de;
+            deSearch.Filter = "(&(objectClass=group) (cn=" + GroupName + "))";
+            SearchResultCollection results = deSearch.FindAll();
+
+            bool isGroupMember = false;
+
+            if (results.Count > 0)
+            {
+                DirectoryEntry group = results[0].GetDirectoryEntry();
+
+                object members = group.Invoke("Members", null);
+                foreach (object member in (IEnumerable<object>)members)
+                {
+                    DirectoryEntry x = new DirectoryEntry(member);
+                    if (x.Name != deUser.Name)
+                    {
+                        isGroupMember = false;
+                    }
+                    else 
+                    {
+                        isGroupMember = true;
+                        break;
+                    }
+                }
+
+                if (!isGroupMember)
+                {
+                    group.Invoke("Add", new object[] { deUser.Path.ToString() });
+                }
+
+                group.Close();
+            }
+            return;
         }
     }
 }

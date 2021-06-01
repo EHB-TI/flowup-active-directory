@@ -91,13 +91,13 @@ namespace MainWindow
 
         private void GetAllUsersAction(object sender, RoutedEventArgs e)
         {
-            fieldResults.Items.Clear();
+            
             try
             {
                 string xmlmessage = "<user><header>"+
                                 "<UUID>Not Set</UUID>" +
-                                "<method>READ</method>" +
-                                "<origin>AD</origin>" +
+                                "<method>READ_ALL</method>" +
+                                "<origin>GUI</origin>" +
                                 "<version>0</version>" +
                                 "<sourceEntityId>Not Set</sourceEntityId>" +
                                 "<timestamp>"+DateTime.Now.ToString()+"</timestamp>" +
@@ -204,35 +204,46 @@ namespace MainWindow
             {
                 Debug.WriteLine(fieldResults.SelectedValue.ToString());
 
-                var user = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToIntraUserObject();
-                user.MetaData = new MetaData { GUID = user.MetaData.GUID, Methode = CRUDMethode.DELETE, Origin = "AD", TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), Version = user.MetaData.Version };
+                string xmlmessage = "<ADUser>" +
+                                $"<cn>{fieldResults.SelectedValue.ToString()}</cn>" +
+                                "<method>READ</method>" +
+                                "<goal>DELETE</goal>" +
+                                "<origin>GUI</origin>" +
+                                "<timestamp>" + DateTime.Now.ToString() + "</timestamp>" +
+                                "</ADUser>";
 
-                if (ProducerV2.send(XMLParser.IntraObjectToXML(user), Severity.AD.ToString()))
-                {
-                    Console.WriteLine(XMLParser.IntraObjectToXML(user));
-                    /*
-                     <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-                      <header>
-                        <method>DELETE</method>
-                        <origin>AD</origin>
-                        <version>0</version>
-                        <timestamp>2021-05-26T15:44:41+02:00</timestamp>
-                      </header>
-                      <body>
-                        <firstname>test</firstname>
-                        <lastname>d</lastname>
-                        <email>test.d@desideriushogeschool.be</email>
-                        <role>docent</role>
-                      </body>
-                    </user>
-                    */
-                    MessageBox.Show("User succesfully deleted!");
-                    btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
-                }
+                ProducerGUI.send(xmlmessage, Severity.AD.ToString());//
+                
+
             }
             else
             {
                 MessageBox.Show("Select a user first!");
+            }
+        }
+        public void DeleteUser(IntraUser user)
+        {
+            if (ProducerV2.send(XMLParser.IntraObjectToXML(user), Severity.AD.ToString()))
+            {
+
+                /*
+                 <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                  <header>
+                    <method>DELETE</method>
+                    <origin>AD</origin>
+                    <version>0</version>
+                    <timestamp>2021-05-26T15:44:41+02:00</timestamp>
+                  </header>
+                  <body>
+                    <firstname>test</firstname>
+                    <lastname>d</lastname>
+                    <email>test.d@desideriushogeschool.be</email>
+                    <role>docent</role>
+                  </body>
+                </user>
+                */
+                MessageBox.Show("User succesfully deleted!");
+                btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
             }
         }
 
@@ -240,7 +251,7 @@ namespace MainWindow
         {
             if (fieldResults.SelectedIndex != -1)
             {
-                var oldUser = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToIntraUserObject();
+                //var oldUser = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToIntraUserObject();
                 DialogWindow w = new DialogWindow(oldUser);
                 w.ShowDialog();
 
@@ -289,6 +300,7 @@ namespace MainWindow
 
         public void GetUsers(string messange)
         {
+            fieldResults.Items.Clear();
             //XDocument xmlUser = XDocument.Parse(messange);
             var test = XMLParser.XMLToObject<List<ADUser>>(messange);
             foreach(var user in test)
@@ -328,7 +340,16 @@ namespace MainWindow
                     //Logger.LogWrite($"Received message on '{routingKey}' Queue; With message = {message}", typeof(ConsumerV2));
                     this.Dispatcher.Invoke(() =>
                     {
-                        GetUsers(message);
+                        try
+                        {
+                            var user = XMLParser.XMLToObject<IntraUser>(message);
+
+                        } 
+                        catch (Exception e)
+                        {
+                            GetUsers(message);
+                        }
+                       
                     });
                     
 

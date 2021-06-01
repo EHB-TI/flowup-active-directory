@@ -56,7 +56,7 @@ namespace Lib.XMLFlow
 
                     string origin = XMLParser.ReadXMLTag(message, "origin");
                     
-                    if (origin != "AD")
+                    if (origin != "AD" && origin != "GUI")
                     {
 
 
@@ -74,9 +74,18 @@ namespace Lib.XMLFlow
                         Console.WriteLine("Consumer: valid");
                        
                         //Get CRUD Operation and tranfser to functionality
-                        if (XMLParser.ReadXMLTag(message, "origin") == "AD")
+                        if (XMLParser.ReadXMLTag(message, "origin") == "GUI")
                         {
-                            XMLParser.ReadXMLTag(message, "method").OperationToCRUD(XMLParser.XMLToObject<IntraUser>(message), CRUD);
+                            string oper = XMLParser.ReadXMLTag(message, "method");
+                            if (oper.Equals("READ"))
+                            {
+
+                                XMLParser.ReadXMLTag(message, "goal").OperationToCRUD(CRUD.FindADUser(XMLParser.ReadXMLTag(message, "cn")).ADObjectToIntraUserObject(), CRUD);
+                            }
+                            else
+                            {
+                                oper.OperationToCRUD(XMLParser.XMLToObject<IntraUser>(message), CRUD);
+                            }
                         }
                         else if (XMLParser.ReadXMLTag(message, "origin") == "UUID")
                         {

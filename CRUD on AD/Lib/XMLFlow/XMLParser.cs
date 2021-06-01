@@ -53,7 +53,7 @@ namespace Lib
                         Uuid.Update(user);
                     }
                     break;
-                case "READ":
+                case "READ_ALL":
                     Debug.WriteLine("Get Users from READ operation");
                     ListUsers.List = crudInstance.GetADUsers();
                     ProducerGUI.send(ObjectToXML(ListUsers.List), Severity.GUI.ToString()); //Make new Producer
