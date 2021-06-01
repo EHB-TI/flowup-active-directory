@@ -118,13 +118,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\source\repos\EHB-TI\flowup-active-directory-client\GUI Client\Lib\Lib.csproj">
+      <Project>{81b8d69b-f195-4f26-84bf-962df6d683cd}</Project>
+      <Name>Lib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DialogWindow\DialogWindow.csproj">
       <Project>{e808399c-6100-44aa-bb70-61f634dff7cc}</Project>
       <Name>DialogWindow</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Lib\Lib.csproj">
-      <Project>{71768368-b246-4dbd-810a-6d5898ec0b60}</Project>
-      <Name>Lib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

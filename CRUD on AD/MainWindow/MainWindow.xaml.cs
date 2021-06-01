@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using Lib;
 using InputWindow;
 using System.Diagnostics;
-using Lib.XMLFlow;
-using Lib.UserFlow;
 using System.Xml.Linq;
 using RabbitMQ.Client.Events;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Text;
 using RabbitMQ.Client;
+using Lib;
 
 namespace MainWindow
 {
@@ -20,9 +18,6 @@ namespace MainWindow
     /// </summary>
     public partial class DemoWindow : Window
     {
-        public CRUD Program { get; set; }
-        
-
         public DemoWindow()
         {
             InitializeComponent();
@@ -74,24 +69,15 @@ namespace MainWindow
             {
                 getMessage();
 
-                
-                //test.Received += (model, ea) =>
-                //{
-
-                //    getusers(ConsumerGUI.getMessag);
-                //};
             }).Start();
            
-
-            Program = new CRUD();
-            Program.Binding(Connection.LOCAL);
             lblCurrent.Content = "Current Connection: LOCAL";      //LOCAL or LDAP
             btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = btnChangeConnection.IsEnabled = false;
         }
 
         private void GetAllUsersAction(object sender, RoutedEventArgs e)
         {
-            
+            fieldResults.Items.Clear();
             try
             {
                 string xmlmessage = "<user><header>"+
@@ -147,7 +133,7 @@ namespace MainWindow
                     var user = w.Answer;
                     if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
                     {
-                        Console.WriteLine(XMLParser.IntraObjectToXML(user));
+                        Console.WriteLine(XMLParser.ObjectToXML(user));
                         //XML Object Send over AD Queueu
                         /*
                         <?xml version="1.0" encoding="utf-16"?>
@@ -183,18 +169,6 @@ namespace MainWindow
 
         private void ChangeConnectionAction(object sender, RoutedEventArgs e)
         {
-            if (Program.Connection == Connection.LOCAL)
-            {
-                Program = new CRUD();
-                Program.Binding(Connection.LDAP);
-                lblCurrent.Content = "Current Connection: LDAP";
-            }
-            else
-            {
-                Program = new CRUD();
-                Program.Binding(Connection.LOCAL);
-                lblCurrent.Content = "Current Connection: LOCAL";
-            }
             btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
         }
 
@@ -212,9 +186,11 @@ namespace MainWindow
                                 "<timestamp>" + DateTime.Now.ToString() + "</timestamp>" +
                                 "</user>";
 
-                ProducerGUI.send(xmlmessage, Severity.AD.ToString());//
-                
-
+                if (ProducerGUI.send(xmlmessage, Severity.AD.ToString())
+)               {
+                    MessageBox.Show("User succesfully deleted!");
+                    btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
+                }
             }
             else
             {
@@ -223,7 +199,7 @@ namespace MainWindow
         }
         public void DeleteUser(IntraUser user)
         {
-            if (ProducerV2.send(XMLParser.IntraObjectToXML(user), Severity.AD.ToString()))
+            if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
             {
 
                 /*
@@ -242,8 +218,7 @@ namespace MainWindow
                   </body>
                 </user>
                 */
-                MessageBox.Show("User succesfully deleted!");
-                btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
+              
             }
         }
 
@@ -251,46 +226,8 @@ namespace MainWindow
         {
             if (fieldResults.SelectedIndex != -1)
             {
-                var oldUser = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToIntraUserObject();
-                DialogWindow w = new DialogWindow(oldUser);
-                w.ShowDialog();
-
-                if (w.DialogResult == true)
-                {
-                    Debug.WriteLine(fieldResults.SelectedValue.ToString());
-                    //try
-                    //{
-                        var user = w.Answer;
-                        if (ProducerV2.send(XMLParser.IntraObjectToXML(user), Severity.AD.ToString()))
-                        {
-                            Console.WriteLine(XMLParser.IntraObjectToXML(user));
-
-                        /*
-                         <?xml version="1.0" encoding="utf-16"?>
-                        <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-                            <header>
-                                <method>UPDATE</method>
-                                <origin>AD</origin>
-                                <version>1</version>
-                                <timestamp>2021-05-26T15:42:39+02:00</timestamp>
-                            </header>
-                            <body>
-                                <firstname>test</firstname>
-                                <lastname>up</lastname>
-                                <email>test.up@student.dhs.be</email>
-                                <role>docent</role>
-                            </body>
-                        </user>
-                         */
-                        MessageBox.Show("Updated user succesfully send!");
-                            btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
-                        }
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    MessageBox.Show(ex.Message);
-                    //}
-                }
+                Console.WriteLine("Update User");
+                MessageBox.Show("Update Action recieved; no implementation yet!!!");
             }
             else
             {
@@ -298,9 +235,52 @@ namespace MainWindow
             }
         }
 
+        public void UpdateUser(IntraUser oldUser)
+        {
+            DialogWindow w = new DialogWindow(oldUser);
+            w.ShowDialog();
+
+            if (w.DialogResult == true)
+            {
+                Debug.WriteLine(fieldResults.SelectedValue.ToString());
+                //try
+                //{
+                var user = w.Answer;
+                if (ProducerV2.send(XMLParser.ObjectToXML(user), Severity.AD.ToString()))
+                {
+                    Console.WriteLine(XMLParser.ObjectToXML(user));
+
+                    /*
+                     <?xml version="1.0" encoding="utf-16"?>
+                    <user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                        <header>
+                            <method>UPDATE</method>
+                            <origin>AD</origin>
+                            <version>1</version>
+                            <timestamp>2021-05-26T15:42:39+02:00</timestamp>
+                        </header>
+                        <body>
+                            <firstname>test</firstname>
+                            <lastname>up</lastname>
+                            <email>test.up@student.dhs.be</email>
+                            <role>docent</role>
+                        </body>
+                    </user>
+                     */
+                    MessageBox.Show("Updated user succesfully send!");
+                    btnCreateUser.IsEnabled = btnDeleteUser.IsEnabled = btnUpdateUser.IsEnabled = false;
+                }
+                //}
+                //catch (Exception ex)
+                //{
+                //    MessageBox.Show(ex.Message);
+                //}
+            }
+        }
+
         public void GetUsers(string messange)
         {
-            fieldResults.Items.Clear();
+
             //XDocument xmlUser = XDocument.Parse(messange);
             var test = XMLParser.XMLToObject<List<ADUser>>(messange);
             foreach(var user in test)

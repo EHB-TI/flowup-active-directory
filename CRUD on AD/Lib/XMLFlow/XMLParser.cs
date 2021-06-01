@@ -12,7 +12,7 @@ using Lib.UserFlow;
 using Lib.UUIDFlow;
 using Lib.XMLFlow;
 
-namespace Lib
+namespace Lib.XMLFlow
 {
     public static class XMLParser
     {

@@ -104,7 +104,6 @@
     <Compile Include="UserFlow\UUIDUser.cs" />
     <Compile Include="UUIDFlow\Uuid.cs" />
     <Compile Include="CRUDFlow\CRUD.cs" />
-    <Compile Include="XMLFlow\ConsumerGUI.cs" />
     <Compile Include="XMLFlow\ConsumerV2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserFlow\IntraUser.cs" />
