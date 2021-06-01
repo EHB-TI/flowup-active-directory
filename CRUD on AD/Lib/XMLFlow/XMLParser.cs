@@ -199,7 +199,15 @@ namespace Lib
             //}
 
 
- 
+            try
+            {
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
                 var serializer = new XmlSerializer(typeof(UUIDUser));
                 var reader = new StringReader(xml);
                 var user = (UUIDUser)serializer.Deserialize(reader);

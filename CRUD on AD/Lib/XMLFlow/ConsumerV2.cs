@@ -78,7 +78,7 @@ namespace Lib.XMLFlow
                         }
                         else if (XMLParser.ReadXMLTag(message, "origin") == "UUID")
                         {
-                            if (XMLParser.ReadXMLTag(message, "method") == "CREATE")
+                            if (XMLParser.ReadXMLTag(message, "method") != "DELETE")
                             {
                                 var user = XMLParser.XMLToExtraObject(message);
 

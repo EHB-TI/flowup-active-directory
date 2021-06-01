@@ -32,7 +32,7 @@ namespace InputWindow
                                             Password = txtPassword.Text.Equals(string.Empty)
                                                 ? Create
                                                     ? "Not Set"
-                                                    : User.UserData.Password
+                                                    : string.Empty
                                                 : txtPassword.Text
                                         }, 
                                         MetaData = Data

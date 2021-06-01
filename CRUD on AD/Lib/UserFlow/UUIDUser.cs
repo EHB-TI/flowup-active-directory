@@ -7,10 +7,14 @@ using System.Xml.Serialization;
 
 namespace Lib.UserFlow
 {
+    [XmlRoot("user")]
     public class UUIDUser
     {
-        public UserData UserData { get; set; }
+
+        [XmlElement("header")]
         public XMetaData MetaData { get; set; }
+        [XmlElement("body")]
+        public UserData UserData { get; set; }
 
         public UUIDUser()
         {

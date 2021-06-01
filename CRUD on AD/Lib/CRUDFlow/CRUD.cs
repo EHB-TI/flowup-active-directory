@@ -66,10 +66,12 @@ namespace Lib
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Password: " + adUser.UserPassword);
                     entry.Invoke("SetPassword", new object[] { "Student1" });
+                    Console.WriteLine("#######Password was rejected from the System######");
+                    Console.WriteLine($"#   Old Password = {adUser.UserPassword}");
+                    Console.WriteLine($"#   New Password = Student1");
+                    Console.WriteLine("##################################################");
                 }
-                
                 entry.Properties["userAccountControl"].Value = (UF_NORMAL_ACCOUNT); // (UF_NORMAL_ACCOUNT | UF_ACCOUNTDISABLE) == 0x0202
 
                 entry.CommitChanges();
@@ -108,7 +110,21 @@ namespace Lib
                 var objUser = SetupSearcher($"(&(objectCategory=Person)(CN={oldUser.CN}))", true).FindOne().GetDirectoryEntry();
 
                 objUser.Rename(newUser.CN);
-                objUser.Invoke("SetPassword", new object[] { newUser.UserPassword }); //Handle Error
+                if (!newUser.UserPassword.Equals(string.Empty))
+                {
+                    try
+                    {
+                        objUser.Invoke("SetPassword", new object[] { newUser.UserPassword });
+                    }
+                    catch (Exception)
+                    {
+                        objUser.Invoke("SetPassword", new object[] { "Student1" });
+                        Console.WriteLine("#######Password was rejected from the System######");
+                        Console.WriteLine($"#   Old Password = {newUser.UserPassword}");
+                        Console.WriteLine($"#   New Password = Student1");
+                        Console.WriteLine("##################################################");
+                    }
+                }
                 newUser.AssignADObjectAttributesToDirectoryEntry(objUser);
 
                 objUser.UsePropertyCache = true;
