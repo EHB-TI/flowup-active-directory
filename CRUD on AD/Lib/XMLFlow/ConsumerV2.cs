@@ -54,9 +54,10 @@ namespace Lib.XMLFlow
 
                     bool xmlValidation = true;
 
+                    Console.WriteLine("Read XML Tag");
                     string origin = XMLParser.ReadXMLTag(message, "origin");
                     
-                    if (origin != "AD" && origin != "GUI")
+                    if (origin != "GUI")
                     {
 
 
@@ -79,7 +80,7 @@ namespace Lib.XMLFlow
                             string oper = XMLParser.ReadXMLTag(message, "method");
                             if (oper.Equals("READ"))
                             {
-
+                                Console.WriteLine("Update objcgoes through!!!!!!");
                                 XMLParser.ReadXMLTag(message, "goal").OperationToCRUD(CRUD.FindADUser(XMLParser.ReadXMLTag(message, "cn")).ADObjectToIntraUserObject(), CRUD);
                             }
                             else
@@ -90,7 +91,7 @@ namespace Lib.XMLFlow
                         else if (XMLParser.ReadXMLTag(message, "origin") == "UUID")
                         {
                             if (XMLParser.ReadXMLTag(message, "method") != "DELETE")
-                            {
+                            { 
                                 var user = XMLParser.XMLToExtraObject(message);
 
                                 user.MetaData.Origin = "AD";

@@ -48,7 +48,7 @@ namespace InputWindow
             Data = new MetaData
             {
                 Methode = CRUDMethode.CREATE,
-                Origin = "AD",
+                Origin = "GUI",
                 TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"),
                 GUID = "NOT SET",
                 Version = 1,
@@ -69,7 +69,7 @@ namespace InputWindow
             Data = new MetaData 
             { 
                 Methode = CRUDMethode.UPDATE, 
-                Origin = "AD", 
+                Origin = "GUI", 
                 TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K"), 
                 GUID = User.MetaData.GUID, 
                 Version = User.MetaData.Version + 1

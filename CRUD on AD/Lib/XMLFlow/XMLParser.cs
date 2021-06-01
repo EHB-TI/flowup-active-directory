@@ -42,6 +42,7 @@ namespace Lib
                 case "DELETE":
                     if (crudInstance.DeleteUser(adUser.CN))
                     {
+                        user.MetaData.Methode = CRUDMethode.DELETE;
                         Uuid.Update(user);
                     }
                     break;
@@ -57,6 +58,8 @@ namespace Lib
                     Debug.WriteLine("Get Users from READ operation");
                     ListUsers.List = crudInstance.GetADUsers();
                     ProducerGUI.send(ObjectToXML(ListUsers.List), Severity.GUI.ToString()); //Make new Producer
+                    break;
+                case "READ":
                     break;
                 default:
                     Console.WriteLine(operation);

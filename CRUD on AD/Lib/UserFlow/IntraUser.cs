@@ -57,6 +57,6 @@ namespace Lib
 
     public enum CRUDMethode
     {
-        CREATE, UPDATE, DELETE, READ, NOTSET
+        CREATE, UPDATE, DELETE, READ, NOTSET, READ_ALL
     }
 }

@@ -112,7 +112,7 @@ namespace MainWindow
                                 "</body></user>";
 
                 //Console.WriteLine(XMLParser.ObjectToXML(Program.GetADUsers()));
-                ProducerV2.send(xmlmessage, Severity.AD.ToString());
+                ProducerGUI.send(xmlmessage, Severity.AD.ToString());
 
                 
 
@@ -204,13 +204,13 @@ namespace MainWindow
             {
                 Debug.WriteLine(fieldResults.SelectedValue.ToString());
 
-                string xmlmessage = "<ADUser>" +
+                string xmlmessage = "<user>" +
                                 $"<cn>{fieldResults.SelectedValue.ToString()}</cn>" +
                                 "<method>READ</method>" +
                                 "<goal>DELETE</goal>" +
                                 "<origin>GUI</origin>" +
                                 "<timestamp>" + DateTime.Now.ToString() + "</timestamp>" +
-                                "</ADUser>";
+                                "</user>";
 
                 ProducerGUI.send(xmlmessage, Severity.AD.ToString());//
                 
@@ -251,7 +251,7 @@ namespace MainWindow
         {
             if (fieldResults.SelectedIndex != -1)
             {
-                //var oldUser = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToIntraUserObject();
+                var oldUser = Program.FindADUser(fieldResults.SelectedValue.ToString()).ADObjectToIntraUserObject();
                 DialogWindow w = new DialogWindow(oldUser);
                 w.ShowDialog();
 

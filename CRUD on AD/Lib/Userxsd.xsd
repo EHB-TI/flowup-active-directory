@@ -24,7 +24,7 @@
               <xs:element name="origin">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
-                    <xs:pattern value="(AD|FrontEnd|Canvas|Monitor|Office|Control|UUID)" />
+                    <xs:pattern value="(AD|FrontEnd|Canvas|Monitor|Office|Control|UUID|GUI)" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>

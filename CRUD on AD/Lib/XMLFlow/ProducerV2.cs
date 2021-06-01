@@ -36,7 +36,7 @@ namespace Lib.XMLFlow
 
                 string origin = XMLParser.ReadXMLTag(message, "origin");
 
-                if (origin != "AD")
+                if (origin != "GUI")
                 {
 
 
