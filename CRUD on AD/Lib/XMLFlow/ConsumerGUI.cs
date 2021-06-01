@@ -14,9 +14,10 @@ namespace Lib.XMLFlow
     {
         public static string getMessag = "";
         public static CRUD CRUD { get; set; }
+        public static EventingBasicConsumer Consumer { get; set; }
         //public static LogWriter Logger { get; set; }    
 
-        public static EventingBasicConsumer getMessage()
+        public static void getMessage()
         {
             CRUD = new CRUD();
             CRUD.Binding(Lib.Connection.LOCAL);
@@ -54,9 +55,11 @@ namespace Lib.XMLFlow
                                      autoAck: true,
                                      consumer: consumer);
 
+                Consumer = consumer;
+
                 Console.WriteLine(" Press [enter] to exit.");
-                //Console.ReadLine();
-                return consumer;
+                Console.ReadLine();
+                
             }
         }
 

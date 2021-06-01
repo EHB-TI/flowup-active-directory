@@ -10,6 +10,8 @@ using System.Xml.Linq;
 using RabbitMQ.Client.Events;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Text;
+using RabbitMQ.Client;
 
 namespace MainWindow
 {
@@ -70,14 +72,16 @@ namespace MainWindow
             //getusers(message);
             new Thread(() =>
             {
-                EventingBasicConsumer test = ConsumerGUI.getMessage();
-                test.Received += (model, ea) =>
-                {
+                getMessage();
 
-                    getusers(ConsumerGUI.getMessag);
-                };
+                
+                //test.Received += (model, ea) =>
+                //{
+
+                //    getusers(ConsumerGUI.getMessag);
+                //};
             }).Start();
-            
+           
 
             Program = new CRUD();
             Program.Binding(Connection.LOCAL);
@@ -283,13 +287,59 @@ namespace MainWindow
             }
         }
 
-        public void getusers(string messange)
+        public void GetUsers(string messange)
         {
             //XDocument xmlUser = XDocument.Parse(messange);
             var test = XMLParser.XMLToObject<List<ADUser>>(messange);
             foreach(var user in test)
             {
                 fieldResults.Items.Add($"CN={user.CN}");
+            }
+        }
+
+        public void getMessage()
+        {
+
+            var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                //rabbitMQ
+                channel.ExchangeDeclare(exchange: "direct_logs",
+                                        type: "direct");
+                var queueName = channel.QueueDeclare().QueueName;
+
+
+                channel.QueueBind(queue: queueName,
+                                  exchange: "direct_logs",
+                                  routingKey: Severity.GUI.ToString());
+                Console.WriteLine(" [*] Waiting for messages.");
+                //Logger.LogWrite("Waiting for messages on 'AD' Queue", typeof(ConsumerV2));
+
+                var consumer = new EventingBasicConsumer(channel);
+                consumer.Received += (model, ea) =>
+                {
+                    //Message
+                    var body = ea.Body.ToArray();
+                    var message = Encoding.UTF8.GetString(body);
+                    var routingKey = ea.RoutingKey;
+
+                    Console.WriteLine(" [x] Recieved '{0}':'{1}'", routingKey, message);
+                    //Logger.LogWrite($"Received message on '{routingKey}' Queue; With message = {message}", typeof(ConsumerV2));
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        GetUsers(message);
+                    });
+                    
+
+                };
+                channel.BasicConsume(queue: queueName,
+                                     autoAck: true,
+                                     consumer: consumer);
+
+                Console.WriteLine(" Press [enter] to exit.");
+                Console.ReadLine();
+
             }
         }
 
