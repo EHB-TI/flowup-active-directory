@@ -139,7 +139,12 @@ namespace Lib
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                Console.WriteLine(ReadXMLTag(xml, "error"));
+                var schema = new XmlSchemaSet();
+                var xmlDoc = XDocument.Parse(xml);
+                var row = xmlDoc.Descendants().Where(x => x.Name.LocalName == "error").First();
+                operation = (string)GetSubElementValue(row, "description");
+                Console.WriteLine(operation);
+                return "ERROR";
             }
             
 
