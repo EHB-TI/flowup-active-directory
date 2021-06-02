@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<user>
+	<body>
+		<firstname>FirstName</firstname>
+		<lastname>LastName</lastname>
+		<email>Email</email>
+		<role>Role</role>
+	</body>
+	<operation>CREATE</operation>
+</user>
