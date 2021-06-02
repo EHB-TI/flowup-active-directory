@@ -24,7 +24,7 @@ namespace Lib.XMLFlow
 
 
 
-
+                //xsd validation
                 XmlSchemaSet schema = new XmlSchemaSet();
 
                 schema.Add("", "Userxsd.xsd"); //Change to Relative Path
