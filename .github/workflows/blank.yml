@@ -1,0 +1,26 @@
+name: .NET
+
+on:
+  push:
+    branches: [ CRUD-Operations ]
+  pull_request:
+    branches: [ CRUD-Operations ]
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+    env:
+      working-directory: ./CRUD_on_AD/TestConsumer/
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Build
+      if: success()
+    # Indien dotnet publish niet werkt dan moet deze stap vervangen worden met 'dotnet build --no-restore'
+    # De stap dotnet publish -c Release zal dan moeten verplaatst worden naar 'Run Docker'
+      run: dotnet publish -c Release
