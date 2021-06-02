@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     env:
       working-directory: ./CRUD_on_AD
       
@@ -25,7 +25,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 4.7.x
     - name: Build
       if: success()
     # Indien dotnet publish niet werkt dan moet deze stap vervangen worden met 'dotnet build --no-restore'
