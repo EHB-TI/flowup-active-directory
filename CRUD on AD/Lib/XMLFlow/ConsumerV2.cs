@@ -80,8 +80,14 @@ namespace Lib.XMLFlow
                             string oper = XMLParser.ReadXMLTag(message, "method");
                             if (oper.Equals("READ"))
                             {
-                                Console.WriteLine("Update objcgoes through!!!!!!");
-                                XMLParser.ReadXMLTag(message, "goal").OperationToCRUD(CRUD.FindADUser(XMLParser.ReadXMLTag(message, "cn")).ADObjectToIntraUserObject(), CRUD);
+                                if (XMLParser.ReadXMLTag(message, "goal").Equals("UPDATE"))
+                                {
+                                    ProducerGUI.send(XMLParser.ObjectToXML(CRUD.FindADUser(XMLParser.ReadXMLTag(message, "cn")).ADObjectToIntraUserObject()), Severity.GUI.ToString());
+                                }
+                                else 
+                                {
+                                    XMLParser.ReadXMLTag(message, "goal").OperationToCRUD(CRUD.FindADUser(XMLParser.ReadXMLTag(message, "cn")).ADObjectToIntraUserObject(), CRUD);
+                                }
                             }
                             else
                             {

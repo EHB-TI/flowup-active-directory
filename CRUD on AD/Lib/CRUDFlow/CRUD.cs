@@ -4,13 +4,15 @@ using System.Diagnostics;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace Lib
 {
     public class CRUD
     {
-        public DirectoryEntry RootOU { get; set; }
+        public DirectoryEntry RootOU { get; set; }  
+        public DirectoryEntry UsersOU { get; set; }
         public Connection Connection { get; set; }
 
         public void Binding(Connection conn)
@@ -20,15 +22,16 @@ namespace Lib
             if (conn == Connection.LOCAL)
             {
                 RootOU = new DirectoryEntry             //SSL on AD DS is standard
-                    ("LDAP://AD-S1-Desiderius-Hogeschool.desideriushogeschool.be/CN=Users,DC=desideriushogeschool,DC=be",
+                    ("LDAP://AD-S1-Desiderius-Hogeschool.desideriushogeschool.be/DC=desideriushogeschool,DC=be",
                     "Administrator",
                     "Student1",
                     AuthenticationTypes.Secure
                     );
+                UsersOU = RootOU.Children.Find("CN=Users");
             }
             if (conn == Connection.LDAP)
             {                                           //SSL connection on port 50001 with ldp.exe works; NOT HERE in C#;
-                RootOU = new DirectoryEntry
+                UsersOU = new DirectoryEntry
                     ("LDAP://localhost:50001/CN=User,CN=User,DC=anakin,DC=local", //Example
                     "Administrator",
                     "Student1",
@@ -43,12 +46,15 @@ namespace Lib
             //Check in AD and UUID for duplicates
             if (IsUserNotInAD(adUser.CN))   
             {
-                var entry = RootOU.Children.Add(adUser.CN, "user");
+                var entry = UsersOU.Children.Add(adUser.CN, "user");
                 entry.Properties["LockOutTime"].Value = 0; //unlock account
-                adUser.AssignADObjectAttributesToDirectoryEntry(entry);
-                AddUserToGroup(RootOU, entry, "licenseUsers");
-                entry.CommitChanges();
 
+                adUser.AssignADObjectAttributesToDirectoryEntry(entry);
+                
+
+                
+                entry.CommitChanges();
+                
                 //Enable Account -- Cannot change account state from another machine
                 const int UF_ACCOUNTDISABLE = 0x0002;
                 const int UF_PASSWD_NOTREQD = 0x0020;
@@ -60,15 +66,19 @@ namespace Lib
                 try
                 {
                     entry.Invoke("SetPassword", new object[] { adUser.UserPassword }); //Handle Error
+                    AddUserToGroup(entry);
+                    Console.WriteLine("User added!");
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Console.WriteLine(e.Message);
                     entry.Invoke("SetPassword", new object[] { "Student1" });
                     Console.WriteLine("#######Password was rejected from the System######");
                     Console.WriteLine($"#   Old Password = {adUser.UserPassword}");
                     Console.WriteLine($"#   New Password = Student1");
                     Console.WriteLine("##################################################");
                 }
+                
                 entry.Properties["userAccountControl"].Value = (UF_NORMAL_ACCOUNT); // (UF_NORMAL_ACCOUNT | UF_ACCOUNTDISABLE) == 0x0202
                 entry.CommitChanges();
                 
@@ -82,7 +92,7 @@ namespace Lib
             if (IsUserInAD(CN))
             {
                 DirectoryEntry objUser = SetupSearcher($"(&(objectCategory=Person)({CN}))").FindOne().GetDirectoryEntry();
-                RootOU.Children.Remove(objUser);
+                UsersOU.Children.Remove(objUser);
                 return true;
             }
             return false;
@@ -154,7 +164,7 @@ namespace Lib
 
         private DirectorySearcher SetupSearcher(string filter, bool loadAttributes=false) 
         {
-            var Searcher = new DirectorySearcher(RootOU); 
+            var Searcher = new DirectorySearcher(UsersOU); 
             Searcher.Filter = filter; //(&(objectCategory=Person)(objectClass=user))
 
             if (loadAttributes)
@@ -187,42 +197,84 @@ namespace Lib
             }
             return true;
         }
-        public static void AddUserToGroup(DirectoryEntry de, DirectoryEntry deUser, string GroupName)
+        public void AddUserToGroup (DirectoryEntry deUser)
         {
-            DirectorySearcher deSearch = new DirectorySearcher();
-            deSearch.SearchRoot = de;
-            deSearch.Filter = "(&(objectClass=group) (cn=" + GroupName + "))";
-            SearchResultCollection results = deSearch.FindAll();
+            DirectoryEntry grp;
+            var de = RootOU.Children.Find("OU=Groups");
+            grp = de.Children.Find("CN=licenseUsers", "group");
 
-            bool isGroupMember = false;
+            Console.WriteLine("First Groep: " + grp.Name + "  ||  " + grp.Parent);
 
-            if (results.Count > 0)
-            {
-                DirectoryEntry group = results[0].GetDirectoryEntry();
+            if (grp != null) { grp.Invoke("Add", new object[] { deUser.Path.ToString() }); }
 
-                object members = group.Invoke("Members", null);
-                foreach (object member in (IEnumerable<object>)members)
-                {
-                    DirectoryEntry x = new DirectoryEntry(member);
-                    if (x.Name != deUser.Name)
-                    {
-                        isGroupMember = false;
-                    }
-                    else 
-                    {
-                        isGroupMember = true;
-                        break;
-                    }
-                }
+            grp.Close();
 
-                if (!isGroupMember)
-                {
-                    group.Invoke("Add", new object[] { deUser.Path.ToString() });
-                }
+            //var userName = cn;
 
-                group.Close();
-            }
-            return;
+            //PrincipalContext systemContext;
+            //try
+            //{
+            //    Console.WriteLine("Building System Information");
+            //    systemContext = new PrincipalContext(ContextType.Machine, null);
+            //}
+            //catch (Exception E)
+            //{
+            //    Console.WriteLine("Failed to create System Context.");
+            //    Console.WriteLine("Exception: " + E);
+
+            //    Console.WriteLine();
+            //    Console.WriteLine("Press Any Key to Continue");
+            //    Console.ReadLine();
+            //    return;
+            //}
+
+            ////Check if user object already exists
+            //Console.WriteLine("Checking if User Exists.");
+
+            //var pcontext = new PrincipalContext(ContextType.Domain, "LDAP://AD-S1-Desiderius-Hogeschool.desideriushogeschool.be/CN=Users,DC=desideriushogeschool,DC=be", "Administrator", "Student1");
+            //UserPrincipal userPrincipal = UserPrincipal.FindByIdentity(pcontext, userName);
+            //if (userPrincipal != null)
+            //{
+            //    Console.WriteLine(userName + " exists. Exiting!!");
+            //    Console.ReadLine();
+            //    return;
+            //}    
+
+            //GroupPrincipal groupPrincipal = null;
+            //var sAdministrators = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null).Translate(typeof(NTAccount)).Value;
+            //groupPrincipal = GroupPrincipal.FindByIdentity(systemContext, "licenseUsers");
+
+            //    if (groupPrincipal != null)
+            //    {
+            //        //check if user is a member
+            //        Console.WriteLine("Checking if itadmin is part of Administrators Group");
+            //        if (groupPrincipal.Members.Contains(systemContext, IdentityType.SamAccountName, userName))
+            //        {
+            //            Console.WriteLine("Administrators already contains " + userName);
+            //            return;
+            //        }
+            //        //Adding the user to the group
+            //        Console.WriteLine("Adding itadmin to Administrators Group");
+            //        groupPrincipal.Members.Add(userPrincipal);
+            //        groupPrincipal.Save();
+            //        return;
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("Could not find the group Administrators");
+            //    }
+
+
+
+            //Console.WriteLine("Cleaning Up");
+
+            //Console.WriteLine();
+            //Console.WriteLine("Press Any Key to Continue");
+            //Console.ReadLine();
+            //return;
+
+
+
         }
     }
 }

@@ -93,8 +93,11 @@ namespace Lib.XMLFlow
             }
             catch (Exception e)
             {
+                var schema = new XmlSchemaSet();
+                var xmlDoc = XDocument.Parse(xml);
+                var row = xmlDoc.Descendants().Where(x => x.Name.LocalName == "error").First();
+                operation = (string)GetSubElementValue(row, "description");
                 Console.WriteLine(e.Message);
-                Console.WriteLine(ReadXMLTag(xml, "error"));
             }
             return operation;
         }
