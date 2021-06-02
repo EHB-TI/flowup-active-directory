@@ -23,4 +23,4 @@ jobs:
       if: success()
     # Indien dotnet publish niet werkt dan moet deze stap vervangen worden met 'dotnet build --no-restore'
     # De stap dotnet publish -c Release zal dan moeten verplaatst worden naar 'Run Docker'
-      run: dotnet publish -c Release
+      run: dotnet build --no-restore
