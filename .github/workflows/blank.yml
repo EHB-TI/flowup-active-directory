@@ -9,23 +9,26 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
       working-directory: ./CRUD_on_AD
       
-    services:
-      rabbitmq:
-        image: rabbitmq:3.8.9-management
-        ports:
-         - 5672:5672
-         - 15672:15672
+      
+
     
     steps:
     - uses: actions/checkout@v2
+    - name: New commit to rabbitmq-common master branch
+      run: |
+          curl --silent --fail --url https://api.github.com/repos/rabbitmq/rabbitmq-server/dispatches \
+          --header "Authorization: Bearer ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
+          --header "Content-Type: application/json" \
+          --data '{ "event_type": "new-commit-to-dep-release-branch", "client_payload": { "dep": "rabbitmq-common" } }'
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.x
+        dotnet-version: 5.0.x
     - name: Build
       if: success()
     # Indien dotnet publish niet werkt dan moet deze stap vervangen worden met 'dotnet build --no-restore'
