@@ -173,7 +173,23 @@ namespace Lib.XMLFlow
                             xmlValidation = false;
                         });
 
-
+                        if (xmlValidation)
+                        {
+                            string error = "<error>"+
+                                            "<header>"+
+                                            "<code>2000</code>"+
+                                            "<origin>AD</origin>"+
+                                            "<timestamp>"+DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K")+"</timestamp>"+
+                                            "</header>"+
+                                            "<body>"+
+                                            "<objectUUID></objectUUID>"+
+                                            "<objectSourceId></objectSourceId>"+
+                                            "<objectOrigin>AD</objectOrigin>"+
+                                            "<description>Something went wrong when adding to the UUID master, DB error:</description>" +
+                                            "</body>" +
+                                            "</error>";
+                            ProducerGUI.send(error, Severity.logging.ToString());
+                        }
                         //xml parsen
                         XDocument xmlUser = XDocument.Parse(message);
                         string errorDescription = "";

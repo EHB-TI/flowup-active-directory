@@ -41,7 +41,7 @@ namespace Lib.XMLFlow
 
                     Console.WriteLine(" [x] Sent '{0}':'{1}'", severity, message);
 
-                    XDocument doc = XDocument.Parse(message);
+                    
 
                     return true;
                 }

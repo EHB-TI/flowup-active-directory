@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Lib.UserFlow;
+using Lib.XMLFlow;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices;
@@ -84,6 +86,21 @@ namespace Lib
                 
                 return true;
             }
+            string error = "<error>"+
+                "<header>"+
+                "<code>3003</code>" +
+                "<origin>AD</origin>"+
+                "<timestamp>"+DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K")+"</timestamp>"+
+                "</header>"+
+                "<body>"+
+                "<objectUUID></objectUUID>"+
+                "<objectSourceId></objectSourceId>"+
+                "<objectOrigin>AD</objectOrigin>"+
+                "<description>The user could not be added to the AD</description>" +
+                "</body>"+
+                "</error>";
+            ProducerGUI.send(error, Severity.logging.ToString());
+
             return false;
         }
 
