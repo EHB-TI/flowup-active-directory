@@ -11,7 +11,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      working-directory: ./CRUD_on_AD/TestConsumer
+      working-directory: ./CRUD_on_AD
     
     steps:
     - uses: actions/checkout@v2
