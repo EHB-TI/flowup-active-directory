@@ -86,22 +86,11 @@ namespace Lib
                 
                 return true;
             }
-            string error = "<error>"+
-                "<header>"+
-                "<code>3003</code>" +
-                "<origin>AD</origin>"+
-                "<timestamp>"+DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K")+"</timestamp>"+
-                "</header>"+
-                "<body>"+
-                "<objectUUID></objectUUID>"+
-                "<objectSourceId></objectSourceId>"+
-                "<objectOrigin>AD</objectOrigin>"+
-                "<description>The user could not be added to the AD</description>" +
-                "</body>"+
-                "</error>";
-            ProducerGUI.send(error, Severity.logging.ToString());
-
-            return false;
+            else
+            {
+                
+                return false;
+            }
         }
 
         public bool DeleteUser(string CN)
@@ -210,7 +199,9 @@ namespace Lib
         {
             if (SetupSearcher($"(&(objectCategory=Person)({CN}))").FindAll().Count != 0)
             {
-                throw new Exception("User exists in Active Directory!");
+                
+                //throw new Exception("User exists in Active Directory!");
+                return false;
             }
             return true;
         }
