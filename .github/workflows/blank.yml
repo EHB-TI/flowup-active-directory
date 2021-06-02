@@ -9,9 +9,9 @@ on:
 jobs:
   build:
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     env:
-      working-directory: ./CRUD_on_AD/TestConsumer/
+      working-directory: ./CRUD_on_AD/TestConsumer
     
     steps:
     - uses: actions/checkout@v2
