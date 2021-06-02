@@ -43,7 +43,7 @@ namespace CPURAM
                     string xmlmessage = "<heartbeat><header><code>2000</code>" +
                     "<origin>AD</origin>" +
                     $"<timestamp>{dt.ToString("yyyy-MM-ddTHH:mm:ss%K")}</timestamp></header>" +
-                    $"<body><nameService>ADDS</nameService><CPUload>{1}</CPUload>" +
+                    $"<body><nameService>ADFS</nameService><CPUload>{1}</CPUload>" +
                     $"<RAMload>{1}</RAMload></body>" +
                     "</heartbeat>";
                     string message = xmlmessage;
