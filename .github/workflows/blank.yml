@@ -12,6 +12,13 @@ jobs:
     runs-on: windows-latest
     env:
       working-directory: ./CRUD_on_AD
+      
+    services:
+      rabbitmq:
+        image: rabbitmq:3.8.9-management
+        ports:
+         - 5672:5672
+         - 15672:15672
     
     steps:
     - uses: actions/checkout@v2
