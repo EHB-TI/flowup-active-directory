@@ -3,6 +3,9 @@ using System.Xml.Serialization;
 
 namespace Lib
 {
+    /**
+     *  Class: An user xml representation that goes OUTSIDE the system (User data flow between the API, the UUID and the outside modules)
+     */
     [XmlRoot("user")]
     public class ExtraUser
     {

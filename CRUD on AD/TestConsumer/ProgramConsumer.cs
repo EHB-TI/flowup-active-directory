@@ -8,14 +8,15 @@ using Lib.XMLFlow;
 
 namespace TestConsumer
 {
+    /**
+    *  Class: Startup Project for the API Consumer to Run
+    */
     class ProgramConsumer
     {
         public static void Main(string[] args)
         {
             Console.WriteLine("Initializing Consumer...");
-            //Logger = new LogWriter("Setup Logge", typeof(ProgramConsumer));
-            
-            //Logger.LogWrite("Setup Consumer on the 'AD' Queue", typeof(ProgramConsumer));
+
             ConsumerV2.getMessage();
         }
     }

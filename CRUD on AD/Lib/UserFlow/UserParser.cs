@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace Lib
 {
+    /**
+     *  Class: A custom parser to convert an user object into an Intra-, Extra-, AD- or DirectoryEntry-user
+     */
     public static class UserParser
     {
-        public static IntraUser ADObjectToIntraUserObject(this ADUser adUser)
-        {
-            return new IntraUser
+        public static IntraUser ADObjectToIntraUserObject(this ADUser adUser) =>
+            new IntraUser
             {
                 UserData = new UserData
                 {
@@ -29,10 +31,8 @@ namespace Lib
                     Version = adUser.ObjectVersion
                 }
             };
-        }
-        public static ExtraUser ConvertIntraToExtra(this IntraUser user)
-        {
-            return new ExtraUser
+        public static ExtraUser ConvertIntraToExtra(this IntraUser user) =>
+            new ExtraUser
             {
                 UserData = new XUserData
                 {
@@ -49,10 +49,8 @@ namespace Lib
                     Version = user.MetaData.Version,
                 }
             };
-        }
-        public static ADUser IntraUserObjectToADObject(this IntraUser user)
-        {
-            return new ADUser
+        public static ADUser IntraUserObjectToADObject(this IntraUser user) =>
+            new ADUser
             {
                 CN = $"CN={user.UserData.FirstName} {user.UserData.LastName}",
                 SN = user.UserData.LastName,
@@ -69,10 +67,8 @@ namespace Lib
                 ObjectVersion = user.MetaData.Version,
                 UserPassword = user.UserData.Password
             };
-        }
-        public static ADUser ExtraUserObjectToADObject(this ExtraUser user)
-        {
-            return new ADUser
+        public static ADUser ExtraUserObjectToADObject(this ExtraUser user) =>
+            new ADUser
             {
                 CN = $"CN={user.UserData.FirstName} {user.UserData.LastName}",
                 SN = user.UserData.LastName,
@@ -88,7 +84,6 @@ namespace Lib
                 BirthDay = user.UserData.BirthDay,
                 ObjectVersion = user.MetaData.Version
             };
-        }
         public static void AssignADObjectAttributesToDirectoryEntry(this ADUser adUser, DirectoryEntry entry)
         {
             entry.Properties["displayName"].Value = adUser.Name;
@@ -107,19 +102,18 @@ namespace Lib
             {
                 CN = (string)entry.Properties["cn"].Value,
                 SN = (string)entry.Properties["sn"].Value,
-                Role = (string)entry.Properties["role"].Value,
                 Name = (string)entry.Properties["name"].Value,
                 GivenName = (string)entry.Properties["givenName"].Value,
                 UserPrincipalName = (string)entry.Properties["userPrincipalName"].Value,
                 Mail = (string)entry.Properties["mail"].Value,
                 DisplayName = (string)entry.Properties["displayName"].Value,
                 SAMAccountName = (string)entry.Properties["sAMAccountName"].Value,
+                //Custom Attributes can be empty in some users, check is needed to avoid NullPointers
+                Role = ((string)entry.Properties["role"].Value is null) ? "Not Set" : (string)entry.Properties["role"].Value ,
                 Study = ((string)entry.Properties["study"].Value is null) ? "Not Set" : (string)entry.Properties["study"].Value,
                 BirthDay = ((string)entry.Properties["birthday"].Value is null) ? "Not Set" : (string)entry.Properties["birthday"].Value,
-                ObjectVersion = (int?)entry.Properties["objectVersion"].Value is null? -1 : (int)entry.Properties["objectVersion"].Value, //Needs to Change, check for NullPointer
+                ObjectVersion = (int?)entry.Properties["objectVersion"].Value is null? -1 : (int)entry.Properties["objectVersion"].Value,
                 ObjectGUID = new Guid((byte[])entry.Properties["objectGUID"].Value).ToString()
             };
-
-
     }
 }

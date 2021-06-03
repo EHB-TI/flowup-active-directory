@@ -7,153 +7,256 @@ using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Security.Principal;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lib
 {
+    /**
+     *  Class: All CRUD (Create|Read|Update|Delete) Functionality, to interact with the users
+     *         in the Active Directory
+     */
     public class CRUD
     {
-        public DirectoryEntry RootOU { get; set; }  
+        //Root Container with all objects/containers in Active Directory
+        public DirectoryEntry RootOU { get; set; }
+        //The 'Users' Container where all users are stored
         public DirectoryEntry UsersOU { get; set; }
-        public Connection Connection { get; set; }
 
-        public void Binding(Connection conn)
+        /**
+         *  Methode: Make a connection with the Active Directory Database with the protocol LDAP
+         */
+        public void Binding()
         {
-            Connection = conn;
-
-            if (conn == Connection.LOCAL)
+            try
             {
-                RootOU = new DirectoryEntry             //SSL on AD DS is standard
+                //Using the Admin credentials
+                RootOU = new DirectoryEntry
                     ("LDAP://AD-S1-Desiderius-Hogeschool.desideriushogeschool.be/DC=desideriushogeschool,DC=be",
                     "Administrator",
                     "Student1",
                     AuthenticationTypes.Secure
                     );
-                UsersOU = RootOU.Children.Find("CN=Users");
+                try
+                {
+                    UsersOU = RootOU.Children.Find("CN=Users");
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("##################################################");
+                    Console.WriteLine($"#        Finding 'Users' Container FAILED        #");
+                    Console.WriteLine("##################################################");
+                    Environment.Exit(-1);
+                }
+
             }
-            if (conn == Connection.LDAP)
-            {                                           //SSL connection on port 50001 with ldp.exe works; NOT HERE in C#;
-                UsersOU = new DirectoryEntry
-                    ("LDAP://localhost:50001/CN=User,CN=User,DC=anakin,DC=local", //Example
-                    "Administrator",
-                    "Student1",
-                    AuthenticationTypes.Secure
-                    );
+            catch (Exception e)
+            {
+                Console.WriteLine("The connection could not be made to the AD Database: " + e.Message);
+                Thread.Sleep(2000);
+                Console.WriteLine("Retrying Connection!");
+                Binding();
             }
         }
 
-
+        /**
+         *  Methode: Create a new user in the Active Directory Database
+         *      @param1 => Incoming user from GUI
+         */
         public bool CreateUser(ADUser adUser)
         {
-            //Check in AD and UUID for duplicates
-            if (IsUserNotInAD(adUser.CN))   
+            //Check in Active Directory DB if the user DOES NOT exist
+            if (!IsUserInAD(adUser.CN))
             {
+                //Create new AD User and add to Users Container
                 var entry = UsersOU.Children.Add(adUser.CN, "user");
-                entry.Properties["LockOutTime"].Value = 0; //unlock account
+                entry.Properties["LockOutTime"].Value = 0;
 
+                //Assign user data to the Active Directory user object
                 adUser.AssignADObjectAttributesToDirectoryEntry(entry);
-                
-
-                
                 entry.CommitChanges();
-                
-                //Enable Account -- Cannot change account state from another machine
-                const int UF_ACCOUNTDISABLE = 0x0002;
-                const int UF_PASSWD_NOTREQD = 0x0020;
-                const int UF_PASSWD_CANT_CHANGE = 0x0040;
+
+                //Enable Account -- Most used flags
+                //const int UF_ACCOUNTDISABLE = 0x0002;
+                //const int UF_PASSWD_NOTREQD = 0x0020;
                 const int UF_NORMAL_ACCOUNT = 0x0200;
-                const int UF_DONT_EXPIRE_PASSWD = 0x10000;
-                const int UF_PASSWORD_EXPIRED = 0x800000;
-                //Minimum 7 characters; and not the same password; else Password Policy will interfere
+                entry.Properties["userAccountControl"].Value = (UF_NORMAL_ACCOUNT); // (UF_NORMAL_ACCOUNT | UF_ACCOUNTDISABLE) == 0x0202
+
+
+                //Minimum 7 characters; and not the same password; else the Password Policy will interfere
                 try
                 {
-                    entry.Invoke("SetPassword", new object[] { adUser.UserPassword }); //Handle Error
-                    AddUserToGroup(entry);
-                    Console.WriteLine("User added!");
+                    entry.Invoke("SetPassword", new object[] { adUser.UserPassword });
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    Console.WriteLine(e.Message);
+                    //If current password gets rejected, a default password is used
                     entry.Invoke("SetPassword", new object[] { "Student1" });
                     Console.WriteLine("#######Password was rejected from the System######");
                     Console.WriteLine($"#   Old Password = {adUser.UserPassword}");
                     Console.WriteLine($"#   New Password = Student1");
                     Console.WriteLine("##################################################");
                 }
-                
-                entry.Properties["userAccountControl"].Value = (UF_NORMAL_ACCOUNT); // (UF_NORMAL_ACCOUNT | UF_ACCOUNTDISABLE) == 0x0202
-                entry.CommitChanges();
-                
+                //Adding users to a security group called "licenseUsers"
+                AddUserToGroup(entry);
+
+                try
+                {
+                    //Commit Changes into the Active Directory DB
+                    entry.CommitChanges();
+                }
+                catch (Exception)
+                {
+                    //If the commit has failed the CRUD has been halted
+                    Console.WriteLine("##################################################");
+                    Console.WriteLine($"#            Commit Changes FAILED               #");
+                    Console.WriteLine("##################################################");
+                    return false;
+                }
                 return true;
             }
             else
             {
-                
+                Console.WriteLine("User allready exists with the given name!");
                 return false;
             }
         }
 
+        /**
+         *  Methode: Delete an user in the Active Directory Database
+         *      @param1 => Container name of AD user
+         */
         public bool DeleteUser(string CN)
         {
+            //Check in Active Directory DB if the user DOES exists
             if (IsUserInAD(CN))
             {
+                //Find the AD user by Container name; and use this varibale to delete the user from the Active Directory DB
                 DirectoryEntry objUser = SetupSearcher($"(&(objectCategory=Person)({CN}))").FindOne().GetDirectoryEntry();
-                UsersOU.Children.Remove(objUser);
+                try
+                {
+                    UsersOU.Children.Remove(objUser);
+                }
+                catch (Exception)
+                {
+                    //If the system rejects the Deletion;
+                    Console.WriteLine("##################################################");
+                    Console.WriteLine($"#   Removing user from Active Directory FAILED   #");
+                    Console.WriteLine("##################################################");
+                }
                 return true;
             }
-            return false;
-        }
-
-        public ADUser FindADUser(string CN)
-        {
-            if (IsUserInAD(CN))
+            else
             {
-                DirectoryEntry objUser = SetupSearcher($"(&(objectCategory=Person)({CN}))", true).FindOne().GetDirectoryEntry();
-                return objUser.DirectoryEntryToADObject();
+                Console.WriteLine("User does not exist in the current Active Directory DB!");
+                return false;
             }
-            return null;
         }
 
+        /**
+        *  Methode: Update a user in the Active Directory Database
+        *      @param1 => The old version of the user
+        *      @param2 => The updated version of the user
+        */
         public bool UpdateUser(ADUser oldUser, ADUser newUser)
         {
-            if (IsUserInAD("CN="+oldUser.CN))
+            //Check in Active Directory DB if the user DOES exists
+            if (IsUserInAD(oldUser.CN))
             {
-                var objUser = SetupSearcher($"(&(objectCategory=Person)(CN={oldUser.CN}))", true).FindOne().GetDirectoryEntry();
+                //Find the Active Directory object with the Container name of the old user
+                var objUser = SetupSearcher($"(&(objectCategory=Person)({oldUser.CN}))", true).FindOne().GetDirectoryEntry();
 
-                objUser.Rename(newUser.CN);
+                try
+                {
+                    //Rename current Active Directory object
+                    objUser.Rename(newUser.CN);
+                }
+                catch (Exception)
+                {
+                    //If the system rejects, renaming the object;
+                    Console.WriteLine("##################################################");
+                    Console.WriteLine($"#   Renaming user from Active Directory FAILED   #");
+                    Console.WriteLine($"#       => Name probably allready exists         #");
+                    Console.WriteLine("##################################################");
+                }
+                
+
+                //If password is empty; than leave the previous password
                 if (!newUser.UserPassword.Equals(string.Empty))
                 {
                     try
                     {
+                        //Invoke the 'Setpassword' function to change the password
                         objUser.Invoke("SetPassword", new object[] { newUser.UserPassword });
                     }
                     catch (Exception)
                     {
-                        objUser.Invoke("SetPassword", new object[] { "Student1" });
+                        //If current password gets rejected, the previous password is used
                         Console.WriteLine("#######Password was rejected from the System######");
-                        Console.WriteLine($"#   Old Password = {newUser.UserPassword}");
-                        Console.WriteLine($"#   New Password = Student1");
+                        Console.WriteLine($"#         Previous password reinstated           #");
                         Console.WriteLine("##################################################");
                     }
                 }
+                //Assign user data to the Active Directory user object
                 newUser.AssignADObjectAttributesToDirectoryEntry(objUser);
-
                 objUser.UsePropertyCache = true;
-                objUser.CommitChanges();
-
-                Console.WriteLine("User succesfully updated!");
+                try
+                {
+                    //Commit Changes into the Active Directory DB
+                    objUser.CommitChanges();
+                }
+                catch (Exception)
+                {
+                    //If the commit has failed the CRUD has been halted
+                    Console.WriteLine("##################################################");
+                    Console.WriteLine($"#            Commit Changes FAILED               #");
+                    Console.WriteLine("##################################################");
+                    return false;
+                }
                 return true;
             }
-            return false;
+            else
+            {
+                Console.WriteLine("User does not exist in the current Active Directory DB!");
+                return false;
+            }
         }
 
+        /**
+        *  Methode: Find an individual user in the Active Directory Database
+        *      @param1 => Container name of AD user
+        */
+        public ADUser FindADUser(string CN)
+        {
+            //Check in Active Directory DB if the user DOES exists
+            if (IsUserInAD(CN))
+            {
+                //Find the AD user by Container name; and use this varibale to return the user from the Active Directory DB
+                DirectoryEntry objUser = SetupSearcher($"(&(objectCategory=Person)({CN}))", true).FindOne().GetDirectoryEntry();
+                return objUser.DirectoryEntryToADObject();
+            }
+            else
+            {
+                Console.WriteLine("User does not exist in the current Active Directory DB!");
+                return null;
+            }
+        }
+
+        /**
+        *  Methode: Get all users from the Active Directory Database
+        */
         public List<ADUser> GetADUsers()
         {
+            //Initialize List to catch incoming users
             var lstADUsers = new List<ADUser>();
+
+            //Find all users
             SearchResultCollection resultCol = SetupSearcher("(&(objectCategory=Person)(objectClass=user))", true).FindAll();
 
+            //Check if results are not null
             if (resultCol != null)
             {
+                //Parse each Active Directory object into a workable user object
                 for (int counter = 0; counter < resultCol.Count; counter++)
                 {
                     var result = resultCol[counter];
@@ -164,15 +267,29 @@ namespace Lib
                         lstADUsers.Add(entry.DirectoryEntryToADObject());
                     }
                 }
+                return lstADUsers;
             }
-            return lstADUsers;
+            else
+            {
+                Console.WriteLine("No users found in the current Active Directory DB!");
+                return null;
+            }
         }
 
-        private DirectorySearcher SetupSearcher(string filter, bool loadAttributes=false) 
+        /**
+        *  Methode: Setup the DirectorySearcher to find a user and its attributes
+        *      @param1 => Filter to find a user, based on Container name
+        *      @param2 => a bool to get all attributes associated with the user, or not
+        */
+        private DirectorySearcher SetupSearcher(string filter, bool loadAttributes = false)
         {
-            var Searcher = new DirectorySearcher(UsersOU); 
-            Searcher.Filter = filter; //(&(objectCategory=Person)(objectClass=user))
+            //Initialize Searcher
+            var Searcher = new DirectorySearcher(UsersOU)
+            {
+                Filter = filter //(&(objectCategory=Person)(objectClass=user))
+            };
 
+            //Add attributes to search if bool=true
             if (loadAttributes)
             {
                 Searcher.PropertiesToLoad.Add("displayname");
@@ -187,102 +304,51 @@ namespace Lib
             }
             return Searcher;
         }
+
+        /**
+        *  Methode: Check if an an individual user exists in the Active Directory Database
+        *      @param1 => Container name of AD user
+        */
         public bool IsUserInAD(string CN)
         {
-            if (SetupSearcher($"(&(objectCategory=Person)({CN}))").FindAll().Count == 0)
-            {
-                throw new Exception("User does not exists in Active Directory!");
-            }
-            return true;
+            return SetupSearcher($"(&(objectCategory=Person)({CN}))").FindAll().Count != 0;
         }
-        public bool IsUserNotInAD(string CN)
+
+        /**
+        *  Methode: Add a user in a security group in Active Directory
+        *      @param1 => The Active Directory object/user
+        */
+        public void AddUserToGroup(DirectoryEntry deUser)
         {
-            if (SetupSearcher($"(&(objectCategory=Person)({CN}))").FindAll().Count != 0)
+            try
             {
-                
-                //throw new Exception("User exists in Active Directory!");
-                return false;
+                //Get the Groups Container and find the group
+                var de = RootOU.Children.Find("OU=Groups");
+                var grp = de.Children.Find("CN=licenseUsers", "group");
+                try
+                {
+                    //Check if group is not null 
+                    if (grp != null) 
+                    {
+                        //Add the Distinguished Name of the user to the group
+                        grp.Invoke("Add", new object[] { deUser.Path.ToString() }); 
+                    }
+                    grp.Close();
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("##################################################");
+                    Console.WriteLine($"#          Adding User to group FAILED           #");
+                    Console.WriteLine("##################################################");
+                    grp.Close();
+                }
             }
-            return true;
-        }
-        public void AddUserToGroup (DirectoryEntry deUser)
-        {
-            DirectoryEntry grp;
-            var de = RootOU.Children.Find("OU=Groups");
-            grp = de.Children.Find("CN=licenseUsers", "group");
-
-            Console.WriteLine("First Groep: " + grp.Name + "  ||  " + grp.Parent);
-
-            if (grp != null) { grp.Invoke("Add", new object[] { deUser.Path.ToString() }); }
-
-            grp.Close();
-
-            //var userName = cn;
-
-            //PrincipalContext systemContext;
-            //try
-            //{
-            //    Console.WriteLine("Building System Information");
-            //    systemContext = new PrincipalContext(ContextType.Machine, null);
-            //}
-            //catch (Exception E)
-            //{
-            //    Console.WriteLine("Failed to create System Context.");
-            //    Console.WriteLine("Exception: " + E);
-
-            //    Console.WriteLine();
-            //    Console.WriteLine("Press Any Key to Continue");
-            //    Console.ReadLine();
-            //    return;
-            //}
-
-            ////Check if user object already exists
-            //Console.WriteLine("Checking if User Exists.");
-
-            //var pcontext = new PrincipalContext(ContextType.Domain, "LDAP://AD-S1-Desiderius-Hogeschool.desideriushogeschool.be/CN=Users,DC=desideriushogeschool,DC=be", "Administrator", "Student1");
-            //UserPrincipal userPrincipal = UserPrincipal.FindByIdentity(pcontext, userName);
-            //if (userPrincipal != null)
-            //{
-            //    Console.WriteLine(userName + " exists. Exiting!!");
-            //    Console.ReadLine();
-            //    return;
-            //}    
-
-            //GroupPrincipal groupPrincipal = null;
-            //var sAdministrators = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null).Translate(typeof(NTAccount)).Value;
-            //groupPrincipal = GroupPrincipal.FindByIdentity(systemContext, "licenseUsers");
-
-            //    if (groupPrincipal != null)
-            //    {
-            //        //check if user is a member
-            //        Console.WriteLine("Checking if itadmin is part of Administrators Group");
-            //        if (groupPrincipal.Members.Contains(systemContext, IdentityType.SamAccountName, userName))
-            //        {
-            //            Console.WriteLine("Administrators already contains " + userName);
-            //            return;
-            //        }
-            //        //Adding the user to the group
-            //        Console.WriteLine("Adding itadmin to Administrators Group");
-            //        groupPrincipal.Members.Add(userPrincipal);
-            //        groupPrincipal.Save();
-            //        return;
-            //    }
-            //    else
-            //    {
-            //        Console.WriteLine("Could not find the group Administrators");
-            //    }
-
-
-
-            //Console.WriteLine("Cleaning Up");
-
-            //Console.WriteLine();
-            //Console.WriteLine("Press Any Key to Continue");
-            //Console.ReadLine();
-            //return;
-
-
-
+            catch (Exception)
+            {
+                Console.WriteLine("##################################################");
+                Console.WriteLine($"#         Finding Group Container FAILED         #");
+                Console.WriteLine("##################################################");
+            }
         }
     }
 }

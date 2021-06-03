@@ -7,17 +7,20 @@ using RabbitMQ.Client;
 
 namespace Lib.XMLFlow
 {
+    /**
+    *  Class: RabbitMQ Producer without XML Validation 
+    *         to send Messages on the GUI Queue;
+    */
     public class ProducerGUI
     {
         public static bool send(string message, string severity)
         {
-
-            Thread.Sleep(2000);
-
+            //Initialize new connection to the RabbitMQ server
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
+                //Declare Exchhange
                 channel.ExchangeDeclare(exchange: "direct_logs",
                                         type: "direct");
 
@@ -30,18 +33,15 @@ namespace Lib.XMLFlow
                     Console.WriteLine("ProducerGUI: valid");
 
 
-
-
+                    //Encode XML string into bytes to send on the Queue
                     var body = Encoding.UTF8.GetBytes(message);
                     channel.BasicPublish(exchange: "direct_logs",
                                          routingKey: severity,
                                          basicProperties: null,
                                          body: body);
 
-
+                    //Confirmation that Message has been sent on the Queue
                     Console.WriteLine(" [x] Sent '{0}':'{1}'", severity, message);
-
-                    
 
                     return true;
                 }
@@ -49,14 +49,6 @@ namespace Lib.XMLFlow
                 {
                     Console.WriteLine("Producer: not valid");
                 }
-
-
-
-
-
-
-
-
             }
             return false;
         }

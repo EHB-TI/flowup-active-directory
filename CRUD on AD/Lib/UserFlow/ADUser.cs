@@ -7,7 +7,9 @@ using System.Xml.Serialization;
 
 namespace Lib
 {
-     
+    /**
+    *  Class: A C# representation of the Attributes in an Active Directory user object
+    */
     public class ADUser
     {
         [XmlElement("cn")]

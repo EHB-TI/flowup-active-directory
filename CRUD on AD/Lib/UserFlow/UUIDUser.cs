@@ -7,6 +7,9 @@ using System.Xml.Serialization;
 
 namespace Lib.UserFlow
 {
+    /**
+     *  Class: An user xml representation of the response from the UUID
+     */
     [XmlRoot("user")]
     public class UUIDUser
     {

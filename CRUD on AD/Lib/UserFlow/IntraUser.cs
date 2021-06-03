@@ -3,6 +3,9 @@ using System.Xml.Serialization;
 
 namespace Lib
 {
+    /**
+     *  Class: An user xml representation that goes INSIDE the system (User data flow between the GUI Client and the API)
+     */
     [XmlRoot("user")]
     public class IntraUser
     {
