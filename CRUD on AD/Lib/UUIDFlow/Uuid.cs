@@ -19,11 +19,8 @@ namespace Lib.UUIDFlow
         public static void Update(IntraUser outUser)
         {
             //Replace the necessairy properties with the right Values to send over the queue
-            outUser.MetaData = new MetaData
-            {
-                Origin = "AD",
-                TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K")
-            };
+            outUser.MetaData.Origin = "AD";
+            outUser.MetaData.TimeStamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K");
 
             /**
              * When some properties of the user are empty, the xml tags alsow dissapear.
